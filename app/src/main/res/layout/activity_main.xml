@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity"
-    android:background="@drawable/bg1">
+    android:background="@drawable/bg1"
+    >
     <Button
         android:id="@+id/btn_main_reconnect"
         android:layout_width="50dp"
