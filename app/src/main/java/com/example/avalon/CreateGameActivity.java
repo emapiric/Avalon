@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.w3c.dom.Text;
 
@@ -28,5 +29,9 @@ public class CreateGameActivity extends AppCompatActivity {
 
     public void createGame(View view) {
        String name = edName.getText().toString();
+        if (name.isEmpty()) {
+            Toast.makeText(getApplicationContext(), "Enter your name", Toast.LENGTH_SHORT).show();
+            return;
+        }
     }
 }
