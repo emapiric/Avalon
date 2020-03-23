@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".CreateGameActivity"
-    android:background="@drawable/bg2">
+    android:background="@drawable/bg2"
+    >
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -33,7 +34,7 @@
             android:id="@+id/ed_creategame_name"
             android:layout_width="250dp"
             android:layout_height="wrap_content"
-            android:text="Enter your name"
+            android:hint="Enter your name"
             android:layout_gravity="center"
             android:fontFamily="sans-serif"
             android:textSize="20sp"
@@ -41,7 +42,8 @@
             android:textColorHint="#FFFFFF"
             android:backgroundTint="#FFFFFF"
             android:padding="10dp"
-            android:layout_margin="10dp"/>
+            android:layout_margin="10dp"
+            android:imeOptions="flagNoFullscreen"/>
         <Button
             android:id="@+id/btn_creategame_create"
             android:layout_width="250dp"

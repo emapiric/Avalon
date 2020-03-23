@@ -25,6 +25,7 @@ public class CreateGameActivity extends AppCompatActivity {
         tvCode = findViewById(R.id.tv_creategame_code);
         tvCode.setText("12345");
     }
+
     public void createGame(View view) {
        String name = edName.getText().toString();
     }

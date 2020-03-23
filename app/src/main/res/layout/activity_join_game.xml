@@ -27,12 +27,13 @@
             android:backgroundTint="#FFFFFF"
             android:padding="10dp"
             android:layout_margin="10dp"
+            android:imeOptions="flagNoFullscreen"
             />
         <EditText
             android:id="@+id/ed_joingame_code"
             android:layout_width="250dp"
             android:layout_height="wrap_content"
-            android:text="Enter the code here"
+            android:hint="Enter the code here"
             android:layout_gravity="center"
             android:fontFamily="sans-serif"
             android:textSize="20sp"
@@ -40,7 +41,8 @@
             android:textColorHint="#FFFFFF"
             android:backgroundTint="#FFFFFF"
             android:padding="10dp"
-            android:layout_margin="10dp"/>
+            android:layout_margin="10dp"
+            android:imeOptions="flagNoFullscreen"/>
         <Button
             android:id="@+id/btn_joingame_join"
             android:layout_width="250dp"
