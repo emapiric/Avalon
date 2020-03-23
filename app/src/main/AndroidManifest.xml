@@ -8,10 +8,12 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AppCompat.NoActionBar">
-        <activity android:name=".CreateGameActivity"></activity>
-        <activity android:name=".JoinGameActivity" />
-        <activity android:name=".MainActivity">
+        android:theme="@style/Theme.AppCompat.NoActionBar"
+        android:windowSoftInputMode="adjustResize"
+        >
+        <activity android:name=".CreateGameActivity" android:screenOrientation="landscape" ></activity>
+        <activity android:name=".JoinGameActivity" android:screenOrientation="landscape" />
+        <activity android:name=".MainActivity" android:screenOrientation="landscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
