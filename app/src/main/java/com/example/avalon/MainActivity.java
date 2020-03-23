@@ -20,4 +20,9 @@ public class MainActivity extends AppCompatActivity {
     public void goToJoinGameActivity(View view) {
         startActivity(new Intent(MainActivity.this,JoinGameActivity.class));
     }
+    public void reconnect(View view) {
+
+    }
+
+
 }
