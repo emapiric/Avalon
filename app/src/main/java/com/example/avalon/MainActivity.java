@@ -33,11 +33,23 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        player = new Player();
+        player = new Player("null","null","null","null");
+        logger.info("OPEN");
         createWebSocketClient();
+        while(webSocketClient == null){
+
+        }
     }
 
     public void goToCreateGameActivity(View view) {
+//        player = new Player("newPlayer", null,null,null);
+        player.setCommand("newPlayer");
+        String message = gson.toJson(player);
+        System.out.println("JSON " + message);
+        webSocketClient.send(message);
+        while(player.getRoomId().equals("null")){
+
+        }
         startActivity(new Intent(MainActivity.this,CreateGameActivity.class));
     }
 
@@ -47,6 +59,9 @@ public class MainActivity extends AppCompatActivity {
 
     public void reconnect(View view) {
 
+        // ucitati iz baze player i roomid
+        //samo ako nije null i ako hoce reconnect
+//        webSocketClient.send(gson.toJson(player));
     }
 
     private void createWebSocketClient() {
@@ -64,14 +79,12 @@ public class MainActivity extends AppCompatActivity {
             public void onOpen() {
                 logger.info("Connected to server!");
 
-                // ucitati iz baze player i roomid
-
-                webSocketClient.send(gson.toJson(player));
             }
 
             @Override
-            public void onTextReceived(String player) {
-                System.out.println(player);
+            public void onTextReceived(String message) {
+                player =  gson.fromJson(message,Player.class);
+                System.out.println("RECEVED FROM SERVER: " + player);
             }
 
             @Override
@@ -100,10 +113,10 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        webSocketClient.setConnectTimeout(10000);
-        webSocketClient.setReadTimeout(60000);
-        webSocketClient.addHeader("Origin", "http://developer.example.com");
-        webSocketClient.enableAutomaticReconnection(5000);
+//        webSocketClient.setConnectTimeout(10000);
+//        webSocketClient.setReadTimeout(60000);
+//        webSocketClient.addHeader("Origin", "http://developer.example.com");
+//        webSocketClient.enableAutomaticReconnection(5000);
         webSocketClient.connect();
     }
 

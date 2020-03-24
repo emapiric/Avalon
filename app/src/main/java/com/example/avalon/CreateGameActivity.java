@@ -30,24 +30,23 @@ public class CreateGameActivity extends AppCompatActivity {
         edName = findViewById(R.id.ed_creategame_name);
         tvCode = findViewById(R.id.tv_creategame_code);
 
-        Player player = MainActivity.player;
-
-        MainActivity.webSocketClient.send(gson.toJson(player));
-
-        while(MainActivity.player.getRoomId() == null){
-
-        }
-
-        player = MainActivity.player;
-
-        tvCode.setText(player.getRoomId());
+        tvCode.setText(MainActivity.player.getRoomId());
     }
 
     public void createGame(View view) {
-       String name = edName.getText().toString();
-        if (name.isEmpty()) {
-            Toast.makeText(getApplicationContext(), "Enter your name", Toast.LENGTH_SHORT).show();
-            return;
+        try {
+            String name = edName.getText().toString();
+            if (name.isEmpty()) {
+                Toast.makeText(getApplicationContext(), "Enter your name", Toast.LENGTH_SHORT).show();
+                return;
+            } else {
+                MainActivity.player.setCommand("updateUsername");
+                MainActivity.player.setUsername(name);
+                MainActivity.webSocketClient.send(gson.toJson(MainActivity.player));
+                Toast.makeText(getApplicationContext(), MainActivity.player.getUsername(), Toast.LENGTH_SHORT).show();
+            }
+        }catch (Exception e){
+            System.out.println(e.getMessage());
         }
     }
 }
