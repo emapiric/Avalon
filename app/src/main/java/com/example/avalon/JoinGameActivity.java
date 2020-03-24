@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 public class JoinGameActivity extends AppCompatActivity {
     EditText edName;
@@ -20,5 +21,9 @@ public class JoinGameActivity extends AppCompatActivity {
     public void joinGame(View view) {
         String name = edName.getText().toString();
         String code = edCode.getText().toString();
+        if (name.isEmpty() || code.isEmpty()) {
+            Toast.makeText(getApplicationContext(), "Enter your name and the code", Toast.LENGTH_SHORT).show();
+            return;
+        }
     }
 }
