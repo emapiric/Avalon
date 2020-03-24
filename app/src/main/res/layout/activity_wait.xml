@@ -134,7 +134,7 @@
                 android:id="@+id/btn_wait_start"
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
-                android:background="@drawable/custom_locked_button"
+                android:background="@drawable/custom_button"
                 android:fontFamily="sans-serif-black"
                 android:text="START"
                 android:textColor="#FFFFFF"
