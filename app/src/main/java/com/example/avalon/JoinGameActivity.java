@@ -2,6 +2,7 @@ package com.example.avalon;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
@@ -46,9 +47,10 @@ public class JoinGameActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "Enter your name and the code", Toast.LENGTH_SHORT).show();
             return;
         }
-        else{
-            Toast.makeText(getApplicationContext(), "Name: " + MainActivity.player.getRoomId(), Toast.LENGTH_SHORT).show();
-            return;
-        }
+//        else{
+//            Toast.makeText(getApplicationContext(), "Name: " + MainActivity.player.getRoomId(), Toast.LENGTH_SHORT).show();
+//            return;
+//        }
+        startActivity(new Intent(JoinGameActivity.this,WaitActivity.class));
     }
 }

@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void goToCreateGameActivity(View view) {
-//        player = new Player("newPlayer", null,null,null);
+        player = new Player("newPlayer", null,null,null);
         player.setCommand("newPlayer");
         String message = gson.toJson(player);
         System.out.println("JSON " + message);

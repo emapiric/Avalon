@@ -39,12 +39,15 @@ public class CreateGameActivity extends AppCompatActivity {
             if (name.isEmpty()) {
                 Toast.makeText(getApplicationContext(), "Enter your name", Toast.LENGTH_SHORT).show();
                 return;
-            } else {
-                MainActivity.player.setCommand("updateUsername");
-                MainActivity.player.setUsername(name);
-                MainActivity.webSocketClient.send(gson.toJson(MainActivity.player));
-                Toast.makeText(getApplicationContext(), MainActivity.player.getUsername(), Toast.LENGTH_SHORT).show();
             }
+
+            MainActivity.player.setCommand("updateUsername");
+            MainActivity.player.setUsername(name);
+            MainActivity.webSocketClient.send(gson.toJson(MainActivity.player));
+            Toast.makeText(getApplicationContext(), MainActivity.player.getUsername(), Toast.LENGTH_SHORT).show();
+
+            startActivity(new Intent(CreateGameActivity.this,WaitActivity.class));
+
         }catch (Exception e){
             System.out.println(e.getMessage());
         }
