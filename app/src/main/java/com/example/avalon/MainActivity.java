@@ -8,31 +8,43 @@ import android.view.View;
 import android.view.WindowManager;
 
 import com.example.avalon.domain.Player;
+import com.example.avalon.service.Service;
+import com.example.avalon.service.impl.ServiceImpl;
 import com.google.gson.Gson;
 
 import tech.gusavila92.websocketclient.WebSocketClient;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.logging.Logger;
 
+/*
+    UNOS USER NAME - A PRE PRELASKA NA NEKI DRUGI ACTIVITY
+ */
 public class MainActivity extends AppCompatActivity {
 
-    private WebSocketClient webSocketClient;
-    public static final String SERVER = "ws://192.168.1.58:9000/Avalon/Server";
+    public static Player player;
+    public static WebSocketClient webSocketClient;
+    public static final String SERVER = "ws://192.168.43.16:9000/Avalon/Server";
     private Gson gson = new Gson();
+    private Service service = new ServiceImpl();
+    private Logger logger =  Logger.getLogger(this.getClass().getName());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        player = new Player();
         createWebSocketClient();
     }
 
     public void goToCreateGameActivity(View view) {
         startActivity(new Intent(MainActivity.this,CreateGameActivity.class));
     }
+
     public void goToJoinGameActivity(View view) {
         startActivity(new Intent(MainActivity.this,JoinGameActivity.class));
     }
+
     public void reconnect(View view) {
 
     }
@@ -50,15 +62,16 @@ public class MainActivity extends AppCompatActivity {
         webSocketClient = new WebSocketClient(uri) {
             @Override
             public void onOpen() {
-                System.out.println("onOpen");
-//                webSocketClient.send("Hello, World!");
-                Player player = new Player("newPlayer", "Milos",null,null);
+                logger.info("Connected to server!");
+
+                // ucitati iz baze player i roomid
+
                 webSocketClient.send(gson.toJson(player));
             }
 
             @Override
-            public void onTextReceived(String message) {
-                System.out.println(message);
+            public void onTextReceived(String player) {
+                System.out.println(player);
             }
 
             @Override
@@ -93,6 +106,5 @@ public class MainActivity extends AppCompatActivity {
         webSocketClient.enableAutomaticReconnection(5000);
         webSocketClient.connect();
     }
-
 
 }
