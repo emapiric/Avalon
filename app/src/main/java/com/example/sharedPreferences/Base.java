@@ -6,6 +6,7 @@ import java.net.NetworkInterface;
 import java.util.Collections;
 import java.util.List;
 
+//Cuvaju samo dva podatka, macAdresu korisnika i idSobe
 public class Base {
 
     private final String preferencesKey = "PreferencesKey";
