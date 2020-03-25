@@ -56,7 +56,8 @@ public class MainActivity extends AppCompatActivity {
 //        while(player.getRoomId().equals("null")){
 //
 //        }
-        startActivity(new Intent(MainActivity.this,CreateGameActivity.class));
+        //startActivity(new Intent(MainActivity.this,CreateGameActivity.class));
+        startActivity(new Intent(MainActivity.this,PlayActivity.class));
     }
 
     public void goToJoinGameActivity(View view) {

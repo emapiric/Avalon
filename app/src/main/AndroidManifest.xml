@@ -15,7 +15,8 @@
         android:theme="@style/Theme.AppCompat.NoActionBar"
         android:windowSoftInputMode="adjustResize">
         <activity android:name=".PlayActivity"
-            android:screenOrientation="landscape" ></activity>
+            android:screenOrientation="landscape"
+           ></activity>
         <activity
             android:name=".WaitActivity"
             android:screenOrientation="landscape" />
