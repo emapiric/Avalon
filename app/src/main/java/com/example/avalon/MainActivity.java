@@ -10,6 +10,7 @@ import android.view.WindowManager;
 import com.example.avalon.domain.Player;
 import com.example.avalon.service.Service;
 import com.example.avalon.service.impl.ServiceImpl;
+import com.example.sharedPreferences.Base;
 import com.google.gson.Gson;
 
 import tech.gusavila92.websocketclient.WebSocketClient;
@@ -24,18 +25,23 @@ public class MainActivity extends AppCompatActivity {
 
     public static Player player;
     public static WebSocketClient webSocketClient;
-    public static final String SERVER = "ws://192.168.43.16:9000/Avalon/Server";
+    public static final String SERVER = "ws://192.168.1.66:9000/Avalon/Server";
     private Gson gson = new Gson();
     private Service service = new ServiceImpl();
     private Logger logger =  Logger.getLogger(this.getClass().getName());
-
+    public Base base;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        base=new Base();
+        Base.sharedPreferences=getSharedPreferences(base.getPreferencesKey(),MODE_PRIVATE);
+
         player = new Player("null","null","null","null");
         logger.info("OPEN");
         createWebSocketClient();
+
+
         while(webSocketClient == null){
 
         }

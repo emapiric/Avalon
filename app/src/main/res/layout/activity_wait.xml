@@ -119,7 +119,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Waiting for players to join"
+                android:text="Waiting for other players to join"
                 android:fontFamily="sans-serif"
                 android:textSize="25sp"
                 android:textColor="#FFFFFF"
