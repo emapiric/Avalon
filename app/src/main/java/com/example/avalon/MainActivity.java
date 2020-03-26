@@ -48,16 +48,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void goToCreateGameActivity(View view) {
-        player = new Player("newPlayer", null,null,null);
-        player.setCommand("newPlayer");
-        String message = gson.toJson(player);
-        System.out.println("JSON " + message);
-        webSocketClient.send(message);
-        while(player.getRoomId().equals("null")){
-
-        }
-        startActivity(new Intent(MainActivity.this,CreateGameActivity.class));
-       // startActivity(new Intent(MainActivity.this,PlayActivity.class));
+//        player = new Player("newPlayer", null,null,null);
+//        player.setCommand("newPlayer");
+//        String message = gson.toJson(player);
+//        System.out.println("JSON " + message);
+//        webSocketClient.send(message);
+//        while(player.getRoomId().equals("null")){
+//
+//        }
+       // startActivity(new Intent(MainActivity.this,CreateGameActivity.class));
+        startActivity(new Intent(MainActivity.this,PlayActivity.class));
     }
 
     public void goToJoinGameActivity(View view) {

@@ -1,8 +1,11 @@
 package com.example.avalon;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -37,6 +40,7 @@ public class PlayActivity extends AppCompatActivity {
         setContentView(R.layout.activity_play);
 
         findViews();
+        navbarMission.setOnNavigationItemSelectedListener(navBarMissionListener);
 
 
     }
@@ -50,5 +54,19 @@ public class PlayActivity extends AppCompatActivity {
         tvPlayersList.add((TextView) findViewById(R.id.tv_player3));
         tvPlayersList.add((TextView) findViewById(R.id.tv_player4));
         tvPlayersList.add((TextView) findViewById(R.id.tv_player5));
+    }
+
+    public BottomNavigationView.OnNavigationItemSelectedListener navBarMissionListener =
+            new BottomNavigationView.OnNavigationItemSelectedListener() {
+                @Override
+                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                    openDialog();
+                    return true;
+                }
+    };
+
+    public void openDialog() {
+        MissionDialog missionDialog = new MissionDialog();
+        missionDialog.show(getSupportFragmentManager(),"example dialog");
     }
 }
