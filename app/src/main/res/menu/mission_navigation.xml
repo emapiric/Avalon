@@ -3,27 +3,27 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/mission1"
-        android:icon="@drawable/ic_crop_square_black_24dp"
+        android:icon="@drawable/ic_mission1"
         android:title="I"
         />
     <item
         android:id="@+id/mission2"
-        android:icon="@drawable/ic_crop_square_black_24dp"
+        android:icon="@drawable/ic_mission2"
         android:title="II"
        />
     <item
         android:id="@+id/mission3"
-        android:icon="@drawable/ic_crop_square_black_24dp"
+        android:icon="@drawable/ic_mission3"
         android:title="III"
         />
     <item
         android:id="@+id/mission4"
-        android:icon="@drawable/ic_crop_square_black_24dp"
+        android:icon="@drawable/ic_mission4"
         android:title="IV"
         />
     <item
         android:id="@+id/mission5"
-        android:icon="@drawable/ic_crop_square_black_24dp"
+        android:icon="@drawable/ic_mission5"
         android:title="V"
         />
 </menu>
