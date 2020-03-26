@@ -33,7 +33,7 @@ public class WaitActivity extends AppCompatActivity {
         username = findViewById(R.id.tv_wait_username);
         listView = findViewById(android.R.id.list);
         btnStart = findViewById(R.id.btn_wait_start);
-        btnStart.setVisibility(View.GONE);
+        btnStart.setVisibility(View.INVISIBLE);
 
 
         //HARDCODE ZA POPUNJAVANJE LISTE

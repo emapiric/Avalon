@@ -6,7 +6,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -21,7 +23,11 @@ public class PlayActivity extends AppCompatActivity {
 
     //Lista u koju ce se ucitati svi igraci kako bi se posle postavila imena u viewove
     List<Player> players;
+    //vidljivost slike i informacija
+    boolean visibleInfo;
 
+    //TextView za You Are
+    TextView tvYouAre;
     //TextView u koji se upisuju dodatne informacije o igracima (npr za Merlina ko su zlikovci)
     TextView tvInfo;
     //ImageView u koji se smesta slika lika
@@ -31,6 +37,8 @@ public class PlayActivity extends AppCompatActivity {
     ArrayList<TextView> tvPlayersList = new ArrayList<>();
     //NavigationBar za misije
     BottomNavigationView navbarMission;
+    //dugme za hide info
+    Button btnHideInfo;
 
 
 
@@ -41,11 +49,13 @@ public class PlayActivity extends AppCompatActivity {
 
         findViews();
         navbarMission.setOnNavigationItemSelectedListener(navBarMissionListener);
+        visibleInfo = true;
 
 
     }
 
     private void findViews() {
+        tvYouAre = findViewById(R.id.tv_you_are);
         tvInfo = findViewById(R.id.tv_info);
         ivCharacter = findViewById(R.id.iv_character);
         navbarMission = findViewById(R.id.navbar_mission);
@@ -54,6 +64,7 @@ public class PlayActivity extends AppCompatActivity {
         tvPlayersList.add((TextView) findViewById(R.id.tv_player3));
         tvPlayersList.add((TextView) findViewById(R.id.tv_player4));
         tvPlayersList.add((TextView) findViewById(R.id.tv_player5));
+        btnHideInfo = findViewById(R.id.btn_hide_info);
     }
 
     public BottomNavigationView.OnNavigationItemSelectedListener navBarMissionListener =
@@ -69,4 +80,22 @@ public class PlayActivity extends AppCompatActivity {
         MissionDialog missionDialog = new MissionDialog();
         missionDialog.show(getSupportFragmentManager(),"example dialog");
     }
+
+    public void hideInfo(View view) {
+        if (visibleInfo) {
+            tvYouAre.setVisibility(View.INVISIBLE);
+            ivCharacter.setVisibility(View.INVISIBLE);
+            tvInfo.setVisibility(View.INVISIBLE);
+            btnHideInfo.setText("SHOW INFO");
+            visibleInfo = false;
+        }
+        else {
+            tvYouAre.setVisibility(View.VISIBLE);
+            ivCharacter.setVisibility(View.VISIBLE);
+            ivCharacter.setVisibility(View.VISIBLE);
+            btnHideInfo.setText("HIDE INFO");
+            visibleInfo = true;
+        }
+    }
+
 }
