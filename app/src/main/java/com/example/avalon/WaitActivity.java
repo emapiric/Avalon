@@ -102,10 +102,11 @@ public class WaitActivity extends AppCompatActivity {
 //                    player = gson.fromJson(message, Player.class);
                     System.out.println("SPISAK IGRACA: " + message);
                     String[] players = message.split(",");
-
+                    playerNames.clear();
                     for (int i = 0; i < players.length; i++ )
                         playerNames.add(players[i]);
 
+                    adapter.notifyDataSetChanged();
                 }catch (Exception e){
                     System.out.println("DRUGI PEDER");
                     System.out.println(e.getMessage());
