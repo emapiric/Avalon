@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
 
     public static Player player;
     public static WebSocketClient webSocketClient;
-    public static final String SERVER = "ws://192.168.1.66:9000/Avalon/Server";
+    public static final String SERVER = "ws://192.168.43.16:9000/Avalon/Server";
     private Gson gson = new Gson();
     private Service service = new ServiceImpl();
     private Logger logger =  Logger.getLogger(this.getClass().getName());
@@ -41,15 +41,14 @@ public class MainActivity extends AppCompatActivity {
         logger.info("OPEN");
         createWebSocketClient();
 
-
         while(webSocketClient == null){
 
         }
     }
 
     public void goToCreateGameActivity(View view) {
-        player = new Player("newPlayer", null,null,null);
         player.setCommand("newPlayer");
+        try{
         String message = gson.toJson(player);
         System.out.println("JSON " + message);
         webSocketClient.send(message);
@@ -58,6 +57,11 @@ public class MainActivity extends AppCompatActivity {
         }
         startActivity(new Intent(MainActivity.this,CreateGameActivity.class));
         //startActivity(new Intent(MainActivity.this,PlayActivity.class));
+        }catch (Exception e){
+            System.out.println("PRVI PEDER");
+            System.out.println(e.getMessage());
+            System.out.println(e.getStackTrace());
+        }
     }
 
     public void goToJoinGameActivity(View view) {
@@ -90,8 +94,14 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onTextReceived(String message) {
-                player =  gson.fromJson(message,Player.class);
-                System.out.println("RECEVED FROM SERVER: " + player);
+                try {
+                    player = gson.fromJson(message, Player.class);
+                    System.out.println("RECEVED FROM SERVER: " + message);
+                }catch (Exception e){
+                    System.out.println("DRUGI PEDER");
+                    System.out.println(e.getMessage());
+                    System.out.println(e.getStackTrace());
+                }
             }
 
             @Override

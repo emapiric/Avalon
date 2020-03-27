@@ -35,17 +35,14 @@ public class CreateGameActivity extends AppCompatActivity {
 
     public void createGame(View view) {
         try {
-//            String name = edName.getText().toString();
-//            if (name.isEmpty()) {
-//                Toast.makeText(getApplicationContext(), "Enter your name", Toast.LENGTH_SHORT).show();
-//                return;
-//            }
-//
-//            MainActivity.player.setCommand("updateUsername");
-//            MainActivity.player.setUsername(name);
-//            MainActivity.webSocketClient.send(gson.toJson(MainActivity.player));
-//            Toast.makeText(getApplicationContext(), MainActivity.player.getUsername(), Toast.LENGTH_SHORT).show();
+            String name = edName.getText().toString();
+            if (name.isEmpty()) {
+                Toast.makeText(getApplicationContext(), "Enter your name", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
+            MainActivity.player.setCommand("setUsername");
+            MainActivity.player.setUsername(name);
             startActivity(new Intent(CreateGameActivity.this,WaitActivity.class));
 
         }catch (Exception e){
