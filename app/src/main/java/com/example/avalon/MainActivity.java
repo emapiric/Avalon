@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
 
     public static Player player;
     public static WebSocketClient webSocketClient;
-    public static final String SERVER = "ws://192.168.43.16:9000/Avalon/Server";
+    public static final String SERVER = "ws://109.93.61.240:9000/Avalon/Server";
     private Gson gson = new Gson();
     private Service service = new ServiceImpl();
     private Logger logger =  Logger.getLogger(this.getClass().getName());
@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
         playerId = base.getPlayerId();
         roomId = base.getRoomId();
 
-        System.out.println("PLAYER I ROOM ID"+ playerId + roomId);
+        System.out.println("PLAYER I ROOM ID: "+ playerId + " "+ roomId);
 
         player = new Player("null","null","null","null");
         logger.info("OPEN");

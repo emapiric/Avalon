@@ -34,7 +34,7 @@ public class JoinGameActivity extends AppCompatActivity {
             return;
         }
 
-        if(validCode(code)){
+        if(!validCode(code)){
             Toast.makeText(getApplicationContext(), "Invalid code", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -58,7 +58,7 @@ public class JoinGameActivity extends AppCompatActivity {
         else{
             MainActivity.base.savePlayerId(MainActivity.player.getPlayerId());
             MainActivity.base.saveRoomId(MainActivity.player.getRoomId());
-            
+
             startActivity(new Intent(JoinGameActivity.this,WaitActivity.class));
         }
 

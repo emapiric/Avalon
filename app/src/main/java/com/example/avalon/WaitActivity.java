@@ -87,7 +87,8 @@ public class WaitActivity extends AppCompatActivity {
     }
 
     public void startGame(View view) {
-        startActivity(new Intent(WaitActivity.this,PlayActivity.class));
+        webSocketClient.send("startGame");
+//        startActivity(new Intent(WaitActivity.this,PlayActivity.class));
     }
 
     private void createWebSocketClient() {
@@ -110,6 +111,10 @@ public class WaitActivity extends AppCompatActivity {
             @Override
             public void onTextReceived(String message) {
                 try {
+                    if(message.equals("startGame")){
+                        startActivity(new Intent(WaitActivity.this,PlayActivity.class));
+                        return;
+                    }
 //                    player = gson.fromJson(message, Player.class);
                     System.out.println("SPISAK IGRACA: " + message);
                     String[] players = message.split(",");
