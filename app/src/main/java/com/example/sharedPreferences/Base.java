@@ -10,8 +10,8 @@ import java.util.List;
 public class Base {
 
     private final String preferencesKey = "PreferencesKey";
-    private final String userKey = "userKey";
-    private final String roomkey = "roomKey";
+    private final String playerId = "playerId";
+    private final String roomId = "roomId";
     //U clasi ne moze da se inicijalizuje SharedPreferences da znate ! Mora u onCreate metodi
     public static SharedPreferences sharedPreferences;
 
@@ -24,53 +24,34 @@ public class Base {
     }
 
     //Ovde ubacujemo mac adresu korisnika u bazu
-    public void saveUserMacAddress() {
+    public void savePlayerId(String playerId) {
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(userKey, getMacAddress());
+        editor.putString(this.playerId, playerId);
         editor.commit();
 
     }
 
     //Ovdje ubacujemo id sobe u bazu
-    public void saveUserRoomId(String roomId) {
+    public void saveRoomId(String roomId) {
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(roomkey, roomId);
+        editor.putString(this.roomId, roomId);
         editor.commit();
 
     }
-//Vraca MAC adresu korisnika
-    public String getUserMacAddress() {
-        return sharedPreferences.getString(userKey, "User doesn't exist");
-    }
-//Vraca id sobe u kojoj se korisnik nalazi
-    public String getUserRoom() {
+
+    //Vraca MAC adresu korisnika
+//    public String getUserMacAddress() {
+//        return sharedPreferences.getString(userKey, "User doesn't exist");
+//    }
+
+    //Vraca id sobe u kojoj se korisnik nalazi
+    public String getRoomId() {
         //Ovaj drugi parametar znaci ako nema nikakvog podatka sa roomKey , on vraca ovu poruju sto sam napisao ,,no room for this user''
-        return sharedPreferences.getString(roomkey, "No room for this user");
+        return sharedPreferences.getString(roomId, "null");
     }
-//Metoda vraca MAC adresu korisnika
-    public String getMacAddress() {
-        try {
-            List<NetworkInterface> all = Collections.list(NetworkInterface.getNetworkInterfaces());
-            for (NetworkInterface nif : all) {
-                if (!nif.getName().equalsIgnoreCase("wlan0")) continue;
 
-                byte[] macBytes = nif.getHardwareAddress();
-                if (macBytes == null) {
-                    return "";
-                }
-
-                StringBuilder res1 = new StringBuilder();
-                for (byte b : macBytes) {
-                    res1.append(Integer.toHexString(b & 0xFF) + ":");
-                }
-
-                if (res1.length() > 0) {
-                    res1.deleteCharAt(res1.length() - 1);
-                }
-                return res1.toString();
-            }
-        } catch (Exception ex) {
-        }
-        return "02:00:00:00:00:00";
+    //Metoda vraca MAC adresu korisnika
+    public String getPlayerId() {
+        return sharedPreferences.getString(playerId, "null");
     }
 }

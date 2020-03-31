@@ -40,7 +40,7 @@ public class PlayActivity extends AppCompatActivity {
     //dugme za hide info
     Button btnHideInfo;
 
-
+    String SERVER;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +51,7 @@ public class PlayActivity extends AppCompatActivity {
         navbarMission.setOnNavigationItemSelectedListener(navBarMissionListener);
         visibleInfo = true;
 
+        SERVER = WaitActivity.SERVER + "/Game";
 
     }
 

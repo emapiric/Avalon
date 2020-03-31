@@ -14,7 +14,6 @@ import com.google.gson.Gson;
 public class JoinGameActivity extends AppCompatActivity {
     EditText edName;
     EditText edCode;
-    Player player;
     Gson gson;
 
     @Override
@@ -29,28 +28,49 @@ public class JoinGameActivity extends AppCompatActivity {
     public void joinGame(View view) {
         String name = edName.getText().toString();
         String code = edCode.getText().toString();
-        player = new Player("enterRoom", name,null,code);
-        if(MainActivity.webSocketClient == null){
-            System.out.println("SOCKET NULL");
-        }
-        if(player == null){
-            System.out.println("SOCKET NULL");
-        }
-        else{
-            System.out.println(gson.toJson(player));
-        }
-        MainActivity.webSocketClient.send(gson.toJson(player));
-        while(MainActivity.player.getRoomId() == null){
 
-        }
         if (name.isEmpty() || code.isEmpty()) {
             Toast.makeText(getApplicationContext(), "Enter your name and the code", Toast.LENGTH_SHORT).show();
             return;
         }
-//        else{
-//            Toast.makeText(getApplicationContext(), "Name: " + MainActivity.player.getRoomId(), Toast.LENGTH_SHORT).show();
-//            return;
-//        }
-        startActivity(new Intent(JoinGameActivity.this,WaitActivity.class));
+
+        if(validCode(code)){
+            Toast.makeText(getApplicationContext(), "Invalid code", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        MainActivity.player.setCommand("enterRoom");
+        MainActivity.player.setUsername(name);
+        MainActivity.player.setRoomId(code);
+
+        if(MainActivity.webSocketClient == null){
+            System.out.println("SOCKET NULL");
+        }
+
+        MainActivity.webSocketClient.send(gson.toJson(MainActivity.player));
+        while(MainActivity.player.getRoomId() == null){
+
+        }
+        if(MainActivity.player.getRoomId().equals("Room does not exist") ||
+                MainActivity.player.getRoomId().equals("Room is full")){
+            Toast.makeText(getApplicationContext(), MainActivity.player.getRoomId(), Toast.LENGTH_SHORT).show();
+        }
+        else{
+            MainActivity.base.savePlayerId(MainActivity.player.getPlayerId());
+            MainActivity.base.saveRoomId(MainActivity.player.getRoomId());
+            
+            startActivity(new Intent(JoinGameActivity.this,WaitActivity.class));
+        }
+
     }
+
+    public boolean validCode(String code){
+        try{
+            int number = Integer.parseInt(code);
+            return true;
+        }catch (Exception e){
+            return false;
+        }
+    }
+
 }

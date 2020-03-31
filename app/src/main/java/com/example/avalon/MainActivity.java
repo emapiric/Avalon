@@ -25,17 +25,24 @@ public class MainActivity extends AppCompatActivity {
 
     public static Player player;
     public static WebSocketClient webSocketClient;
-    public static final String SERVER = "ws://109.93.61.240:9000/Avalon/Server";
+    public static final String SERVER = "ws://192.168.43.16:9000/Avalon/Server";
     private Gson gson = new Gson();
     private Service service = new ServiceImpl();
     private Logger logger =  Logger.getLogger(this.getClass().getName());
-    public Base base;
+    public static Base base;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         base=new Base();
         Base.sharedPreferences=getSharedPreferences(base.getPreferencesKey(),MODE_PRIVATE);
+
+        String playerId, roomId;
+
+        playerId = base.getPlayerId();
+        roomId = base.getRoomId();
+
+        System.out.println("PLAYER I ROOM ID"+ playerId + roomId);
 
         player = new Player("null","null","null","null");
         logger.info("OPEN");
@@ -55,8 +62,12 @@ public class MainActivity extends AppCompatActivity {
         while(player.getRoomId().equals("null")){
 
         }
+
+        base.savePlayerId(player.getPlayerId());
+        base.saveRoomId(player.getRoomId());
+
         startActivity(new Intent(MainActivity.this,CreateGameActivity.class));
-        //startActivity(new Intent(MainActivity.this,PlayActivity.class));
+
         }catch (Exception e){
             System.out.println("PRVI PEDER");
             System.out.println(e.getMessage());

@@ -5,6 +5,9 @@ import tech.gusavila92.websocketclient.WebSocketClient;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -28,7 +31,8 @@ public class WaitActivity extends AppCompatActivity {
     ArrayAdapter<String> adapter;
     Player player;
     WebSocketClient webSocketClient = null;
-    String SERVER;
+    public static String SERVER;
+    Handler playersHandler;
 
     public ArrayList<String> playerNames;
     private Logger logger =  Logger.getLogger(this.getClass().getName());
@@ -40,12 +44,18 @@ public class WaitActivity extends AppCompatActivity {
         setContentView(R.layout.activity_wait);
 
         player = MainActivity.player;
+        System.out.println("KOMANDA JE" + player.getCommand());
 
         hostname = findViewById(R.id.tv_wait_hostname);
         username = findViewById(R.id.tv_wait_username);
         listView = findViewById(android.R.id.list);
         btnStart = findViewById(R.id.btn_wait_start);
-        btnStart.setVisibility(View.INVISIBLE);
+
+        if(player.getCommand().equals("enterRoom"))
+            btnStart.setVisibility(View.INVISIBLE);
+        else
+            btnStart.setVisibility(View.VISIBLE);
+
         SERVER = MainActivity.SERVER + "/" + player.getRoomId() + "/" + player.getPlayerId();
         createWebSocketClient();
 
@@ -69,9 +79,10 @@ public class WaitActivity extends AppCompatActivity {
         adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, playerNames);
         listView.setAdapter(adapter);
 
+//        startUpdateing();
+
         //KAD SE UCITA SVE OD SERVERA PREKINE SE LOADING I ENABLEUJE SE DUGME I MENJA MU SE POZADINA MALO ESTETIKE I TI FAZONI
-        if(player.getCommand().equals("newPlayer"))
-            findViewById(R.id.loadingBar).setVisibility(View.GONE);
+//        findViewById(R.id.loadingBar).setVisibility(View.GONE);
 
     }
 
@@ -103,10 +114,19 @@ public class WaitActivity extends AppCompatActivity {
                     System.out.println("SPISAK IGRACA: " + message);
                     String[] players = message.split(",");
                     playerNames.clear();
-                    for (int i = 0; i < players.length; i++ )
-                        playerNames.add(players[i]);
+                    for (int i = 0; i < players.length; i++ ) {
+                        if(!players[i].equals(player.getUsername())) {
+                            playerNames.add(players[i]);
+                            System.out.println(i + ". igrac je " + players[i]);
+                        }
+                    }
+                    new Handler(Looper.getMainLooper()).post(new Runnable() { // Tried new Handler(Looper.myLopper()) also
+                        @Override
+                        public void run() {
+                            adapter.notifyDataSetChanged();
+                        }
+                    });
 
-                    adapter.notifyDataSetChanged();
                 }catch (Exception e){
                     System.out.println("DRUGI PEDER");
                     System.out.println(e.getMessage());
@@ -146,4 +166,32 @@ public class WaitActivity extends AppCompatActivity {
 //        webSocketClient.enableAutomaticReconnection(5000);
         webSocketClient.connect();
     }
+
+//    private void startUpdateing() {
+//        updateThread = new UpdateThread();
+//        updateThread.start();
+//    }
+
+//    public class UpdateThread extends Thread {
+//        private static final int DELAY = 10000;
+//
+//        @Override
+//        public void run() {
+//            adapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, playerNames);
+//            listView.setAdapter(adapter);
+//            while (true) {
+//
+//
+//                adapter.notifyDataSetChanged();
+//
+//                try {
+//                    Thread.sleep(DELAY);
+//                } catch (InterruptedException e) {
+//                    return;
+//                }
+//            }
+//        }
+//    }
+
 }
+
