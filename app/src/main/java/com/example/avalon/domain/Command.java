@@ -51,4 +51,12 @@ public class Command {
                 ", nominated=" + Arrays.toString(nominated) +
                 '}';
     }
+
+    public String nominatedToString() {
+        String string = "";
+        for (String name : nominated) {
+            string+=name+" ";
+        }
+        return string;
+    }
 }

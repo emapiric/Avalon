@@ -3,6 +3,8 @@ package com.example.avalon;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -11,8 +13,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.example.avalon.domain.Command;
 import com.example.avalon.domain.Player;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.gson.Gson;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -44,6 +48,9 @@ public class PlayActivity extends AppCompatActivity {
 
     String SERVER;
     WebSocketClient webSocketClient;
+    private Gson gson = new Gson();
+
+    String role;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +65,10 @@ public class PlayActivity extends AppCompatActivity {
         navbarMission.setOnNavigationItemSelectedListener(navBarMissionListener);
         visibleInfo = true;
 
+        //HARDKODOVANJE ZA TESTIRANJE SETIMAGEANDINFO
+//        String[] info = {"zli1", "zli2"};
+//        Command command = new Command("com","val",info);
+//        setImageAndInfo("Merlin", command);
 
         SERVER = WaitActivity.SERVER + "/Game";
 
@@ -165,8 +176,16 @@ public class PlayActivity extends AppCompatActivity {
 
             @Override
             public void onTextReceived(String message) {
-
-            }
+                Command command = gson.fromJson(message, Command.class);
+                switch (command.getCommand()) {
+                    case "role" :
+                        role = command.getValue();
+                        setImageAndInfo(role, command);
+                        break;
+                    default:
+                        break;
+                }
+             }
 
             @Override
             public void onBinaryReceived(byte[] data) {
@@ -195,6 +214,54 @@ public class PlayActivity extends AppCompatActivity {
         };
 
         webSocketClient.connect();
+    }
+
+    private void setImageAndInfo(String role, Command command) {
+        Drawable imageDrawable = null;
+
+        switch(role) {
+            case "Merlin":
+                imageDrawable = getResources().getDrawable(R.drawable.merlin);
+                tvInfo.setText("Evil players are: "+ command.nominatedToString());
+                break;
+            case "Percival":
+                imageDrawable = getResources().getDrawable(R.drawable.percival);
+                tvInfo.setText("Merlin and Morgana are: " + command.nominatedToString());
+                break;
+            case "Lancelot":
+                imageDrawable = getResources().getDrawable(R.drawable.lancelot);
+                break;
+            case "Pleb1":
+                imageDrawable = getResources().getDrawable(R.drawable.pleb1);
+                    break;
+            case "Pleb2":
+                imageDrawable = getResources().getDrawable(R.drawable.pleb2);
+                break;
+            case "Pleb3":
+                imageDrawable = getResources().getDrawable(R.drawable.pleb3);
+                break;
+            case "Morgana":
+                tvInfo.setText("Mordred and Assassin are: " + command.nominatedToString());
+                imageDrawable = getResources().getDrawable(R.drawable.morgana);
+                break;
+            case "Mordred":
+                tvInfo.setText("Morgana and Assassin are: " + command.nominatedToString());
+                imageDrawable = getResources().getDrawable(R.drawable.mordred);
+                break;
+            case "Assassin":
+                tvInfo.setText("Morgana and Mordred are: " + command.nominatedToString());
+                imageDrawable = getResources().getDrawable(R.drawable.assassin);
+                break;
+            case "Oberon":
+                imageDrawable = getResources().getDrawable(R.drawable.oberon);
+                break;
+            default:
+                break;
+        }
+
+        if (imageDrawable != null) {
+            ivCharacter.setImageDrawable(imageDrawable);
+        }
     }
 
 }
