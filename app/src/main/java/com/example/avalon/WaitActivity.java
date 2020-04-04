@@ -46,10 +46,7 @@ public class WaitActivity extends AppCompatActivity {
         player = MainActivity.player;
         System.out.println("KOMANDA JE" + player.getCommand());
 
-        hostname = findViewById(R.id.tv_wait_hostname);
-        username = findViewById(R.id.tv_wait_username);
-        listView = findViewById(android.R.id.list);
-        btnStart = findViewById(R.id.btn_wait_start);
+        findViews();
 
         if(player.getCommand().equals("enterRoom"))
             btnStart.setVisibility(View.INVISIBLE);
@@ -84,6 +81,13 @@ public class WaitActivity extends AppCompatActivity {
         //KAD SE UCITA SVE OD SERVERA PREKINE SE LOADING I ENABLEUJE SE DUGME I MENJA MU SE POZADINA MALO ESTETIKE I TI FAZONI
 //        findViewById(R.id.loadingBar).setVisibility(View.GONE);
 
+    }
+
+    private void findViews() {
+        hostname = findViewById(R.id.tv_wait_hostname);
+        username = findViewById(R.id.tv_wait_username);
+        listView = findViewById(android.R.id.list);
+        btnStart = findViewById(R.id.btn_wait_start);
     }
 
     public void startGame(View view) {
