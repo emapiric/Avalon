@@ -3,22 +3,23 @@ package com.example.avalon;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.avalon.domain.Player;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+
+import tech.gusavila92.websocketclient.WebSocketClient;
 
 public class PlayActivity extends AppCompatActivity {
 
@@ -42,6 +43,7 @@ public class PlayActivity extends AppCompatActivity {
     Button btnHideInfo;
 
     String SERVER;
+    WebSocketClient webSocketClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +53,8 @@ public class PlayActivity extends AppCompatActivity {
         //INICIJALIZACIJA VIEW-OVA I BRISANJE NEPOTREBNIH PIJUNA
         //PARAMETAR - BROJ IGRACA
         findViews(7);
+        loadNamesToTextViews();
+
         navbarMission.setOnNavigationItemSelectedListener(navBarMissionListener);
         visibleInfo = true;
 
@@ -58,6 +62,8 @@ public class PlayActivity extends AppCompatActivity {
         SERVER = WaitActivity.SERVER + "/Game";
 
     }
+
+
 
     private void findViews(int n) {
         tvYouAre = findViewById(R.id.tv_you_are);
@@ -103,6 +109,12 @@ public class PlayActivity extends AppCompatActivity {
         }
     }
 
+    private void loadNamesToTextViews() {
+        for (int i = 0; i < tvPlayersList.size(); i++) {
+            tvPlayersList.get(i).setText(WaitActivity.playerNames.get(i));
+        }
+    }
+
     public BottomNavigationView.OnNavigationItemSelectedListener navBarMissionListener =
             new BottomNavigationView.OnNavigationItemSelectedListener() {
                 @Override
@@ -132,6 +144,57 @@ public class PlayActivity extends AppCompatActivity {
             btnHideInfo.setText("HIDE INFO");
             visibleInfo = true;
         }
+    }
+
+    private void createWebSocketClient() {
+        URI uri;
+        try {
+            uri = new URI(SERVER);
+        }
+        catch (URISyntaxException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        webSocketClient = new WebSocketClient(uri) {
+            @Override
+            public void onOpen() {
+                //prima se poruka s likom od servera
+
+            }
+
+            @Override
+            public void onTextReceived(String message) {
+
+            }
+
+            @Override
+            public void onBinaryReceived(byte[] data) {
+                System.out.println("onBinaryReceived");
+            }
+
+            @Override
+            public void onPingReceived(byte[] data) {
+                System.out.println("onPingReceived");
+            }
+
+            @Override
+            public void onPongReceived(byte[] data) {
+                System.out.println("onPongReceived");
+            }
+
+            @Override
+            public void onException(Exception e) {
+                System.out.println(e.getMessage());
+            }
+
+            @Override
+            public void onCloseReceived() {
+                System.out.println("onCloseReceived");
+            }
+        };
+
+        webSocketClient.connect();
     }
 
 }

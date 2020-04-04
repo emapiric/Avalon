@@ -34,7 +34,7 @@ public class WaitActivity extends AppCompatActivity {
     public static String SERVER;
     Handler playersHandler;
 
-    public ArrayList<String> playerNames;
+    public static ArrayList<String> playerNames;
     private Logger logger =  Logger.getLogger(this.getClass().getName());
 
 
