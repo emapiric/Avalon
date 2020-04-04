@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.avalon.domain.Command;
 import com.example.avalon.domain.Player;
@@ -59,7 +60,7 @@ public class PlayActivity extends AppCompatActivity {
 
         //INICIJALIZACIJA VIEW-OVA I BRISANJE NEPOTREBNIH PIJUNA
         //PARAMETAR - BROJ IGRACA
-        findViews(7);
+        findViews(5);
         loadNamesToTextViews();
 
         navbarMission.setOnNavigationItemSelectedListener(navBarMissionListener);
@@ -182,6 +183,17 @@ public class PlayActivity extends AppCompatActivity {
                         role = command.getValue();
                         setImageAndInfo(role, command);
                         break;
+                    case "onMove" :
+                        String playerOnMove = command.getValue();
+                        //ova dole linija je za to da se promeni boja pijuna u zuto
+                        //videcemo da li ce da bude smaranja oko vracanja u belo tj kad to da se uradi
+                        //getTextViewByPlayersName(command.getValue()).setCompoundDrawablesWithIntrinsicBounds(null,null,null,getResources().getDrawable(R.drawable.player_on_move));
+                        Toast.makeText(getApplicationContext(), playerOnMove+" on move", Toast.LENGTH_SHORT).show();
+                        if (playerOnMove.equals(MainActivity.player.getUsername())) {
+                            Toast.makeText(getApplicationContext(), "Select players for the quest", Toast.LENGTH_SHORT).show();
+                            selectPlayersForQuest();
+                        }
+                        break;
                     default:
                         break;
                 }
@@ -215,6 +227,7 @@ public class PlayActivity extends AppCompatActivity {
 
         webSocketClient.connect();
     }
+
 
     private void setImageAndInfo(String role, Command command) {
         Drawable imageDrawable = null;
@@ -261,7 +274,21 @@ public class PlayActivity extends AppCompatActivity {
 
         if (imageDrawable != null) {
             ivCharacter.setImageDrawable(imageDrawable);
+            //ivCharacter.setImageDrawable(Drawable.createFromPath("src\\main\\res\\drawable\\merlin.JPG"));
         }
+    }
+
+    private TextView getTextViewByPlayersName(String value) {
+        for (TextView tv : tvPlayersList) {
+            if(tv.getText().toString().equals(value))
+                return tv;
+        }
+        return null;
+    }
+
+
+    private void selectPlayersForQuest() {
+
     }
 
 }

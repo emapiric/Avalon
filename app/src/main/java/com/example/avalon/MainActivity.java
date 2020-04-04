@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
 
     public static Player player;
     public static WebSocketClient webSocketClient;
-    public static final String SERVER = "ws://109.93.61.240:9000/Avalon/Server";
+    public static final String SERVER = "ws://localhost:9000/Avalon/Server";
     private Gson gson = new Gson();
     private Service service = new ServiceImpl();
     private Logger logger =  Logger.getLogger(this.getClass().getName());
@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
             System.out.println(e.getMessage());
             System.out.println(e.getStackTrace());
         }
-       // startActivity(new Intent(MainActivity.this,PlayActivity.class));
+     //  startActivity(new Intent(MainActivity.this,PlayActivity.class));
     }
 
     public void goToJoinGameActivity(View view) {
