@@ -21,11 +21,8 @@ import com.example.avalon.domain.Player;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.gson.Gson;
 
-import org.w3c.dom.Text;
-
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.sql.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -267,7 +264,6 @@ public class PlayActivity extends AppCompatActivity {
                         break;
                     case "missionFinished":
                         Toast.makeText(getApplicationContext(), "Mission has "+command.getValue(), Toast.LENGTH_SHORT).show();
-
                         break;
                     default:
                         break;
@@ -376,7 +372,7 @@ public class PlayActivity extends AppCompatActivity {
 
     public void sendVoteToServer(String vote) {
         voteDialog.dismiss();
-        Command command = new Command("vote",vote, username);
+        Command command = new Command("vote",vote);
         String message = gson.toJson(command);
         webSocketClient.send(message);
     }
@@ -387,6 +383,7 @@ public class PlayActivity extends AppCompatActivity {
         missionDialog.show(getSupportFragmentManager(),"example dialog");
     }
 
+    //probaj da server posalje niz tipa yes yes no no pa onda na osnovu toga ucitaj kruzice
     public void showVoteNextToPlayer(Command command) {
         String playersName = command.getNominated()[0];
         TextView tv = getTextViewByPlayersName(playersName);
