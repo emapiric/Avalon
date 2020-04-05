@@ -18,6 +18,13 @@ public class Command {
         this.command = command;
         this.value = value;
     }
+    public Command(String command, String value, String nominated) {
+        this.command = command;
+        this.value = value;
+        String[] array = new String[1];
+        array[0] = nominated;
+        this.nominated = array;
+    }
 
     public String getCommand() {
         return command;
@@ -52,11 +59,4 @@ public class Command {
                 '}';
     }
 
-    public String nominatedToString() {
-        String string = "";
-        for (String name : nominated) {
-            string+=name+" ";
-        }
-        return string;
-    }
 }

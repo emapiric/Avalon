@@ -2,6 +2,7 @@ package com.example.avalon;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
 
 import android.content.Intent;
 import android.content.res.Resources;
@@ -58,6 +59,7 @@ public class PlayActivity extends AppCompatActivity {
 
     String role;
     ArrayList<String> nominatedPlayers;
+    public VoteDialog voteDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +84,11 @@ public class PlayActivity extends AppCompatActivity {
 
         //HARDKODOVANJE ZA TESTIRANJE NOMINACIJE
 //        enablePlayerNomination();
+
+        //HARDKODOVANJE ZA TESTIRANJE GLASANJA ZA NOMINOVANE
+//        String[] nominated = {"Milos","Ema"};
+//        Command command = new Command("nominated", "Marko", nominated);
+//        openVoteDialog(command);
 
     }
 
@@ -150,7 +157,7 @@ public class PlayActivity extends AppCompatActivity {
         String[] nominatedPlayersArray = new String[nominatedPlayers.size()];
         nominatedPlayers.toArray(nominatedPlayersArray);
       //  Command command = new Command("nominate", "username",nominatedPlayersArray);
-        Command command = new Command("nominate", MainActivity.player.getUsername(),nominatedPlayersArray);
+        Command command = new Command("nominated", MainActivity.player.getUsername(),nominatedPlayersArray);
         String message = gson.toJson(command);
         webSocketClient.send(message);
         System.out.println(command.toString());
@@ -250,6 +257,9 @@ public class PlayActivity extends AppCompatActivity {
                             enablePlayerNomination();
                         }
                         break;
+                    case "nominated" :
+                        openVoteDialog(command);
+                        break;
                     default:
                         break;
                 }
@@ -293,7 +303,7 @@ public class PlayActivity extends AppCompatActivity {
                 break;
             case "Percival":
                 imageDrawable = getResources().getDrawable(R.drawable.percival);
-                tvInfo.setText("Merlin and Morgana are: " + command.nominatedToString());
+                tvInfo.setText("Merlin and Morgana are: " + Arrays.toString(command.getNominated()));
                 break;
             case "Lancelot":
                 imageDrawable = getResources().getDrawable(R.drawable.lancelot);
@@ -308,15 +318,15 @@ public class PlayActivity extends AppCompatActivity {
                 imageDrawable = getResources().getDrawable(R.drawable.pleb3);
                 break;
             case "Morgana":
-                tvInfo.setText("Mordred and Assassin are: " + command.nominatedToString());
+                tvInfo.setText("Mordred and Assassin are: " + Arrays.toString(command.getNominated()));
                 imageDrawable = getResources().getDrawable(R.drawable.morgana);
                 break;
             case "Mordred":
-                tvInfo.setText("Morgana and Assassin are: " + command.nominatedToString());
+                tvInfo.setText("Morgana and Assassin are: " + Arrays.toString(command.getNominated()));
                 imageDrawable = getResources().getDrawable(R.drawable.mordred);
                 break;
             case "Assassin":
-                tvInfo.setText("Morgana and Mordred are: " + command.nominatedToString());
+                tvInfo.setText("Morgana and Mordred are: " + Arrays.toString(command.getNominated()));
                 imageDrawable = getResources().getDrawable(R.drawable.assassin);
                 break;
             case "Oberon":
@@ -347,4 +357,19 @@ public class PlayActivity extends AppCompatActivity {
         }
         btnNominate.setVisibility(View.VISIBLE);
     }
+
+    public void openVoteDialog(Command command) {
+        FragmentManager manager = getSupportFragmentManager();
+        voteDialog = VoteDialog.newInstance(command);
+        voteDialog.setCancelable(false);
+        voteDialog.show(manager, "VOTE_DIALOG");
+    }
+
+    public void sendVoteToServer(String vote) {
+        voteDialog.dismiss();
+        Command command = new Command("vote",vote, MainActivity.player.getUsername());
+        String message = gson.toJson(command);
+        webSocketClient.send(message);
+    }
+
 }

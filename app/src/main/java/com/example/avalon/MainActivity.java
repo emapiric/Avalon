@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
             System.out.println(e.getMessage());
             System.out.println(e.getStackTrace());
         }
-     //  startActivity(new Intent(MainActivity.this,PlayActivity.class));
+      // startActivity(new Intent(MainActivity.this,PlayActivity.class));
     }
 
     public void goToJoinGameActivity(View view) {
