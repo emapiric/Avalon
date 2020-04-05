@@ -3,6 +3,7 @@ package com.example.avalon;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -21,7 +22,9 @@ import com.google.gson.Gson;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.sql.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import tech.gusavila92.websocketclient.WebSocketClient;
@@ -46,12 +49,15 @@ public class PlayActivity extends AppCompatActivity {
     BottomNavigationView navbarMission;
     //dugme za hide info
     Button btnHideInfo;
+    //dugme za slanje nominacije
+    Button btnNominate;
 
     String SERVER;
     WebSocketClient webSocketClient;
     private Gson gson = new Gson();
 
     String role;
+    ArrayList<String> nominatedPlayers;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,21 +66,24 @@ public class PlayActivity extends AppCompatActivity {
 
         //INICIJALIZACIJA VIEW-OVA I BRISANJE NEPOTREBNIH PIJUNA
         //PARAMETAR - BROJ IGRACA
-        findViews(5);
+        findViews(10);
+        setListeners();
         loadNamesToTextViews();
 
         navbarMission.setOnNavigationItemSelectedListener(navBarMissionListener);
         visibleInfo = true;
 
-        //HARDKODOVANJE ZA TESTIRANJE SETIMAGEANDINFO
+        SERVER = WaitActivity.SERVER + "/Game";
+
+    //    HARDKODOVANJE ZA TESTIRANJE SETIMAGEANDINFO
 //        String[] info = {"zli1", "zli2"};
 //        Command command = new Command("com","val",info);
 //        setImageAndInfo("Merlin", command);
 
-        SERVER = WaitActivity.SERVER + "/Game";
+        //HARDKODOVANJE ZA TESTIRANJE NOMINACIJE
+//        enablePlayerNomination();
 
     }
-
 
 
     private void findViews(int n) {
@@ -93,8 +102,58 @@ public class PlayActivity extends AppCompatActivity {
         tvPlayersList.add((TextView) findViewById(R.id.tv_player9));
         tvPlayersList.add((TextView) findViewById(R.id.tv_player10));
         btnHideInfo = findViewById(R.id.btn_hide_info);
+        btnNominate = findViewById(R.id.btn_nominate);
         //BRISANJE TJ. SAKRIVANJE VISKA PIJUNA
         deletePlayerViews(n);
+    }
+
+    private void setListeners() {
+        for (TextView tv : tvPlayersList) {
+            tv.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    TextView clickedTextView = (TextView) v;
+                    String nominatedPlayer = clickedTextView.getText().toString();
+                    if (addToNominatedPlayers(nominatedPlayer)) {
+                        clickedTextView.setCompoundDrawablesWithIntrinsicBounds(null, null, null, getResources().getDrawable(R.drawable.player_nominated));
+                    }
+                    else{
+                        clickedTextView.setCompoundDrawablesWithIntrinsicBounds(null, null, null, getResources().getDrawable(R.drawable.player));
+                    }
+                }
+            });
+        }
+
+        btnNominate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendNominatedPlayersToServer();
+                for (TextView tv : tvPlayersList) {
+                    tv.setClickable(false);
+                    tv.setCompoundDrawablesWithIntrinsicBounds(null, null, null, getResources().getDrawable(R.drawable.player));
+                }
+                v.setVisibility(View.INVISIBLE);
+            }
+        });
+    }
+
+    private boolean addToNominatedPlayers(String nominatedPlayer) {
+        if (nominatedPlayers.contains(nominatedPlayer)) {
+            nominatedPlayers.remove(nominatedPlayer);
+            return false;
+        }
+        nominatedPlayers.add(nominatedPlayer);
+        return true;
+    }
+
+    private void sendNominatedPlayersToServer() {
+        String[] nominatedPlayersArray = new String[nominatedPlayers.size()];
+        nominatedPlayers.toArray(nominatedPlayersArray);
+      //  Command command = new Command("nominate", "username",nominatedPlayersArray);
+        Command command = new Command("nominate", MainActivity.player.getUsername(),nominatedPlayersArray);
+        String message = gson.toJson(command);
+        webSocketClient.send(message);
+        System.out.println(command.toString());
     }
 
     public void deletePlayerViews(int n) {
@@ -185,13 +244,10 @@ public class PlayActivity extends AppCompatActivity {
                         break;
                     case "onMove" :
                         String playerOnMove = command.getValue();
-                        //ova dole linija je za to da se promeni boja pijuna u zuto
-                        //videcemo da li ce da bude smaranja oko vracanja u belo tj kad to da se uradi
-                        //getTextViewByPlayersName(command.getValue()).setCompoundDrawablesWithIntrinsicBounds(null,null,null,getResources().getDrawable(R.drawable.player_on_move));
                         Toast.makeText(getApplicationContext(), playerOnMove+" on move", Toast.LENGTH_SHORT).show();
                         if (playerOnMove.equals(MainActivity.player.getUsername())) {
                             Toast.makeText(getApplicationContext(), "Select players for the quest", Toast.LENGTH_SHORT).show();
-                            selectPlayersForQuest();
+                            enablePlayerNomination();
                         }
                         break;
                     default:
@@ -228,14 +284,12 @@ public class PlayActivity extends AppCompatActivity {
         webSocketClient.connect();
     }
 
-
     private void setImageAndInfo(String role, Command command) {
         Drawable imageDrawable = null;
-
         switch(role) {
             case "Merlin":
                 imageDrawable = getResources().getDrawable(R.drawable.merlin);
-                tvInfo.setText("Evil players are: "+ command.nominatedToString());
+                tvInfo.setText("Evil players are: "+ Arrays.toString(command.getNominated()));
                 break;
             case "Percival":
                 imageDrawable = getResources().getDrawable(R.drawable.percival);
@@ -286,9 +340,11 @@ public class PlayActivity extends AppCompatActivity {
         return null;
     }
 
-
-    private void selectPlayersForQuest() {
-
+    private void enablePlayerNomination() {
+        nominatedPlayers = new ArrayList<>();
+        for (TextView tv : tvPlayersList) {
+            tv.setClickable(true);
+        }
+        btnNominate.setVisibility(View.VISIBLE);
     }
-
 }
