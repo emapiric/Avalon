@@ -21,6 +21,8 @@ import com.example.avalon.domain.Player;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.gson.Gson;
 
+import org.w3c.dom.Text;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.Array;
@@ -56,6 +58,7 @@ public class PlayActivity extends AppCompatActivity {
     String SERVER;
     WebSocketClient webSocketClient;
     private Gson gson = new Gson();
+    String username = MainActivity.player.getUsername();
 
     String role;
     ArrayList<String> nominatedPlayers;
@@ -91,7 +94,14 @@ public class PlayActivity extends AppCompatActivity {
 //        openVoteDialog(command);
 
     }
-
+    public BottomNavigationView.OnNavigationItemSelectedListener navBarMissionListener =
+            new BottomNavigationView.OnNavigationItemSelectedListener() {
+                @Override
+                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                    openDialog();
+                    return true;
+                }
+            };
 
     private void findViews(int n) {
         tvYouAre = findViewById(R.id.tv_you_are);
@@ -157,7 +167,7 @@ public class PlayActivity extends AppCompatActivity {
         String[] nominatedPlayersArray = new String[nominatedPlayers.size()];
         nominatedPlayers.toArray(nominatedPlayersArray);
       //  Command command = new Command("nominate", "username",nominatedPlayersArray);
-        Command command = new Command("nominated", MainActivity.player.getUsername(),nominatedPlayersArray);
+        Command command = new Command("nominated", username,nominatedPlayersArray);
         String message = gson.toJson(command);
         webSocketClient.send(message);
         System.out.println(command.toString());
@@ -191,20 +201,6 @@ public class PlayActivity extends AppCompatActivity {
         for (int i = 0; i < tvPlayersList.size(); i++) {
             tvPlayersList.get(i).setText(WaitActivity.playerNames.get(i));
         }
-    }
-
-    public BottomNavigationView.OnNavigationItemSelectedListener navBarMissionListener =
-            new BottomNavigationView.OnNavigationItemSelectedListener() {
-                @Override
-                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                    openDialog();
-                    return true;
-                }
-    };
-
-    public void openDialog() {
-        MissionDialog missionDialog = new MissionDialog();
-        missionDialog.show(getSupportFragmentManager(),"example dialog");
     }
 
     public void hideInfo(View view) {
@@ -252,13 +248,26 @@ public class PlayActivity extends AppCompatActivity {
                     case "onMove" :
                         String playerOnMove = command.getValue();
                         Toast.makeText(getApplicationContext(), playerOnMove+" on move", Toast.LENGTH_SHORT).show();
-                        if (playerOnMove.equals(MainActivity.player.getUsername())) {
+                        if (playerOnMove.equals(username)) {
                             Toast.makeText(getApplicationContext(), "Select players for the quest", Toast.LENGTH_SHORT).show();
                             enablePlayerNomination();
                         }
                         break;
                     case "nominated" :
                         openVoteDialog(command);
+                        break;
+                    case "nominatedVote":
+                        showVoteNextToPlayer(command);
+                        break;
+                    case "missionStarted":
+                        Toast.makeText(getApplicationContext(), "Mission in progress", Toast.LENGTH_SHORT).show();
+                        if (playerOnMission(command.getNominated())) {
+                            openVoteDialog(command);
+                        }
+                        break;
+                    case "missionFinished":
+                        Toast.makeText(getApplicationContext(), "Mission has "+command.getValue(), Toast.LENGTH_SHORT).show();
+
                         break;
                     default:
                         break;
@@ -367,9 +376,32 @@ public class PlayActivity extends AppCompatActivity {
 
     public void sendVoteToServer(String vote) {
         voteDialog.dismiss();
-        Command command = new Command("vote",vote, MainActivity.player.getUsername());
+        Command command = new Command("vote",vote, username);
         String message = gson.toJson(command);
         webSocketClient.send(message);
+    }
+
+    //jos nije uradjeno - dijalog za misiju
+    public void openDialog() {
+        MissionDialog missionDialog = new MissionDialog();
+        missionDialog.show(getSupportFragmentManager(),"example dialog");
+    }
+
+    public void showVoteNextToPlayer(Command command) {
+        String playersName = command.getNominated()[0];
+        TextView tv = getTextViewByPlayersName(playersName);
+        if (command.getValue().equals("YES"))
+            tv.setCompoundDrawablesWithIntrinsicBounds(getResources().getDrawable(R.drawable.circle_green),null,null,getResources().getDrawable(R.drawable.player));
+        else
+            tv.setCompoundDrawablesWithIntrinsicBounds(getResources().getDrawable(R.drawable.circle_red),null,null,getResources().getDrawable(R.drawable.player));
+    }
+
+    private boolean playerOnMission(String[] nominated) {
+        for (String player :  nominated) {
+            if (player.equals(username))
+                return true;
+        }
+        return false;
     }
 
 }

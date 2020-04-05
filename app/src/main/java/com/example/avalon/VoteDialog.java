@@ -32,7 +32,13 @@ public class VoteDialog extends DialogFragment {
         View view = inflater.inflate(R.layout.dialog_vote, container);
         final PlayActivity parent = (PlayActivity)getActivity();
         findViews(view);
-        tvInfo.setText(command.getValue()+" nominated " + Arrays.toString(command.getNominated())+"\nDo you agree to send them on a quest?");
+        if (command.getCommand().equals("nominated")) {
+            tvInfo.setText(command.getValue()+" nominated " + Arrays.toString(command.getNominated())+"\nDo you agree to send them on a mission?");
+        }
+        //u suprotnom je u pitanju komanda za obaranje/prolaz misije
+        else {
+            tvInfo.setText("Do you want this mission to pass?");
+        }
         btnYes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
