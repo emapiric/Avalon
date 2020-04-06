@@ -167,7 +167,7 @@ public class PlayActivity extends AppCompatActivity {
             nominatedPlayers.remove(nominatedPlayer);
             return false;
         }
-        if (nominatedPlayersListFull()) {
+        if (nominatedPlayersListFull() || missionID == 0) {
             Toast.makeText(getApplicationContext(), "You selected the maximum number of players.", Toast.LENGTH_SHORT).show();
             return false;
         }
@@ -189,7 +189,6 @@ public class PlayActivity extends AppCompatActivity {
         Command command = new Command("nominated", username,nominatedPlayersArray);
         String message = gson.toJson(command);
         webSocketClient.send(message);
-        System.out.println(command.toString());
     }
 
     public void deletePlayerViews(int n) {
@@ -290,6 +289,28 @@ public class PlayActivity extends AppCompatActivity {
                         Mission mission = Mission.createMission(totalNumberOfPlayers, missionID, command.getNegativeVotes(), result, command.getNominated());
                         addMissionToDialog(mission);
                         missionID++;
+                        break;
+                    case "gameOver":
+                        if (command.getValue().equals("Good")) {
+                            if (role.equals("Assassin")) {
+                                Toast.makeText(getApplicationContext(), "Select Merlin", Toast.LENGTH_SHORT).show();
+                                missionID = 0;
+                                enablePlayerNomination();
+                            }
+                        }
+                        else {
+                            Toast.makeText(getApplicationContext(), "Evil team won", Toast.LENGTH_SHORT).show();
+                        }
+                        break;
+                    case "merlinGuessed":
+                        String assassinUsername = command.getNominated()[0];
+                        String merlinUsername = command.getNominated()[1];
+                        if (command.getValue().equals("Yes")) {
+                            Toast.makeText(getApplicationContext(), "Evil team won. Assassin "+assassinUsername+" guessed "+" Merlin "+merlinUsername , Toast.LENGTH_SHORT).show();
+                        }
+                        else {
+                            Toast.makeText(getApplicationContext(), "Good team won. Assassin was "+assassinUsername+" and Merlin was "+merlinUsername, Toast.LENGTH_SHORT).show();
+                        }
                         break;
                     default:
                         break;
@@ -462,6 +483,5 @@ public class PlayActivity extends AppCompatActivity {
         missionDialog.selectedItem = item;
         missionDialog.show(getSupportFragmentManager(),"MISSION_DIALOG");
     }
-
 
 }
