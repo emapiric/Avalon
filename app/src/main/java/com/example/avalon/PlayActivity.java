@@ -167,8 +167,19 @@ public class PlayActivity extends AppCompatActivity {
             nominatedPlayers.remove(nominatedPlayer);
             return false;
         }
+        if (nominatedPlayersListFull()) {
+            Toast.makeText(getApplicationContext(), "You selected the maximum number of players.", Toast.LENGTH_SHORT).show();
+            return false;
+        }
         nominatedPlayers.add(nominatedPlayer);
         return true;
+    }
+
+    private boolean nominatedPlayersListFull() {
+        Mission mission = Mission.createMission(missionID, totalNumberOfPlayers);
+        if (nominatedPlayers.size() == mission.getTotalNumberOfVotes())
+            return true;
+        return false;
     }
 
     private void sendNominatedPlayersToServer() {

@@ -14,12 +14,22 @@ public class Mission {
     private String result;
     private String[] nominated;
 
+    public Mission(int id) {
+        this.id = id;
+    }
+
     public Mission(int id, int negativeVotes, String result, String[] nominated) {
         this.id = id;
         this.negativeVotes = negativeVotes;
         this.result = result;
         this.nominated = nominated;
         this.minNegativeVotes = 1;
+    }
+
+    public static Mission createMission(int numberOfPlayers, int id) {
+        Mission mission = new Mission(id);
+        mission = MissionHandler.setNumberOfVotes(mission, numberOfPlayers,id);
+        return mission;
     }
 
     public static Mission createMission(int numberOfPlayers, int id, int negativeVotes, String result, String[] nominated) {
