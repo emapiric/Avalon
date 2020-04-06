@@ -17,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.avalon.domain.Command;
+import com.example.avalon.domain.Mission;
 import com.example.avalon.domain.Player;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.gson.Gson;
@@ -56,19 +57,31 @@ public class PlayActivity extends AppCompatActivity {
     WebSocketClient webSocketClient;
     private Gson gson = new Gson();
     String username = MainActivity.player.getUsername();
-
+    //hardkod za username
+    //String username = "username";
     String role;
     ArrayList<String> nominatedPlayers;
     public VoteDialog voteDialog;
+    MissionDialog missionDialog = new MissionDialog();
+
+    int missionID;
+    int totalNumberOfPlayers;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_play);
 
+        //ucitaj broj igraca
+        totalNumberOfPlayers = WaitActivity.playerNames.size();
+        missionID = 1;
+
+        //hardkod za numberofplayers
+        //totalNumberOfPlayers = 5;
+
         //INICIJALIZACIJA VIEW-OVA I BRISANJE NEPOTREBNIH PIJUNA
         //PARAMETAR - BROJ IGRACA
-        findViews(10);
+        findViews(totalNumberOfPlayers);
         setListeners();
         loadNamesToTextViews();
 
@@ -90,15 +103,13 @@ public class PlayActivity extends AppCompatActivity {
 //        Command command = new Command("nominated", "Marko", nominated);
 //        openVoteDialog(command);
 
+        //HARDKOD ZA MISSION DIALOG
+//        String[] niz = {"Igrac1","Igrac2"};
+//        Command command = new Command("komanda","passed", niz, 1);
+//        String result = command.getValue();
+//        Mission mission = Mission.createMission(totalNumberOfPlayers, missionID, command.getNegativeVotes(), result, command.getNominated());
+//        addMissionToDialog(mission);
     }
-    public BottomNavigationView.OnNavigationItemSelectedListener navBarMissionListener =
-            new BottomNavigationView.OnNavigationItemSelectedListener() {
-                @Override
-                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                    openDialog();
-                    return true;
-                }
-            };
 
     private void findViews(int n) {
         tvYouAre = findViewById(R.id.tv_you_are);
@@ -263,7 +274,11 @@ public class PlayActivity extends AppCompatActivity {
                         }
                         break;
                     case "missionFinished":
-                        Toast.makeText(getApplicationContext(), "Mission has "+command.getValue(), Toast.LENGTH_SHORT).show();
+                        String result = command.getValue();
+                        Toast.makeText(getApplicationContext(), "Mission has "+result, Toast.LENGTH_SHORT).show();
+                        Mission mission = Mission.createMission(totalNumberOfPlayers, missionID, command.getNegativeVotes(), result, command.getNominated());
+                        addMissionToDialog(mission);
+                        missionID++;
                         break;
                     default:
                         break;
@@ -364,10 +379,9 @@ public class PlayActivity extends AppCompatActivity {
     }
 
     public void openVoteDialog(Command command) {
-        FragmentManager manager = getSupportFragmentManager();
         voteDialog = VoteDialog.newInstance(command);
         voteDialog.setCancelable(false);
-        voteDialog.show(manager, "VOTE_DIALOG");
+        voteDialog.show(getSupportFragmentManager(), "VOTE_DIALOG");
     }
 
     public void sendVoteToServer(String vote) {
@@ -377,20 +391,22 @@ public class PlayActivity extends AppCompatActivity {
         webSocketClient.send(message);
     }
 
-    //jos nije uradjeno - dijalog za misiju
-    public void openDialog() {
-        MissionDialog missionDialog = new MissionDialog();
-        missionDialog.show(getSupportFragmentManager(),"example dialog");
-    }
-
-    //probaj da server posalje niz tipa yes yes no no pa onda na osnovu toga ucitaj kruzice
+    //server posalje niz tipa yes yes no no pa onda na osnovu toga ucitaj kruzice
     public void showVoteNextToPlayer(Command command) {
-        String playersName = command.getNominated()[0];
-        TextView tv = getTextViewByPlayersName(playersName);
-        if (command.getValue().equals("YES"))
-            tv.setCompoundDrawablesWithIntrinsicBounds(getResources().getDrawable(R.drawable.circle_green),null,null,getResources().getDrawable(R.drawable.player));
-        else
-            tv.setCompoundDrawablesWithIntrinsicBounds(getResources().getDrawable(R.drawable.circle_red),null,null,getResources().getDrawable(R.drawable.player));
+        int i = 0;
+        for (TextView tv : tvPlayersList) {
+            if (command.getNominated()[i].equals("YES"))
+                tv.setCompoundDrawablesWithIntrinsicBounds(getResources().getDrawable(R.drawable.circle_green),null,null,getResources().getDrawable(R.drawable.player));
+            else
+                tv.setCompoundDrawablesWithIntrinsicBounds(getResources().getDrawable(R.drawable.circle_red),null,null,getResources().getDrawable(R.drawable.player));
+            i++;
+        }
+//        String playersName = command.getNominated()[0];
+//        TextView tv = getTextViewByPlayersName(playersName);
+//        if (command.getValue().equals("YES"))
+//            tv.setCompoundDrawablesWithIntrinsicBounds(getResources().getDrawable(R.drawable.circle_green),null,null,getResources().getDrawable(R.drawable.player));
+//        else
+//            tv.setCompoundDrawablesWithIntrinsicBounds(getResources().getDrawable(R.drawable.circle_red),null,null,getResources().getDrawable(R.drawable.player));
     }
 
     private boolean playerOnMission(String[] nominated) {
@@ -400,5 +416,41 @@ public class PlayActivity extends AppCompatActivity {
         }
         return false;
     }
+
+    private void addMissionToDialog(Mission mission) {
+        switch(missionID) {
+            case 1:
+                missionDialog.mission1 = mission;
+                break;
+            case 2:
+                missionDialog.mission2 = mission;
+                break;
+            case 3:
+                missionDialog.mission3 = mission;
+                break;
+            case 4:
+                missionDialog.mission4 = mission;
+                break;
+            default:
+                missionDialog.mission5 = mission;
+                break;
+        }
+    }
+
+    public BottomNavigationView.OnNavigationItemSelectedListener navBarMissionListener =
+            new BottomNavigationView.OnNavigationItemSelectedListener() {
+                @Override
+                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                    openDialog(item);
+                    return true;
+                }
+            };
+
+    //jos nije uradjeno - dijalog za misiju
+    public void openDialog(MenuItem item) {
+        missionDialog.selectedItem = item;
+        missionDialog.show(getSupportFragmentManager(),"MISSION_DIALOG");
+    }
+
 
 }
