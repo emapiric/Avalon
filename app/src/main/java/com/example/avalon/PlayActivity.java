@@ -63,6 +63,7 @@ public class PlayActivity extends AppCompatActivity {
     ArrayList<String> nominatedPlayers;
     public VoteDialog voteDialog;
     MissionDialog missionDialog = new MissionDialog();
+    GameOverDialog gameOverDialog;
 
     int missionID;
     int totalNumberOfPlayers;
@@ -299,18 +300,11 @@ public class PlayActivity extends AppCompatActivity {
                             }
                         }
                         else {
-                            Toast.makeText(getApplicationContext(), "Evil team won", Toast.LENGTH_SHORT).show();
+                            openGameOverDialog(command);
                         }
                         break;
                     case "merlinGuessed":
-                        String assassinUsername = command.getNominated()[0];
-                        String merlinUsername = command.getNominated()[1];
-                        if (command.getValue().equals("Yes")) {
-                            Toast.makeText(getApplicationContext(), "Evil team won. Assassin "+assassinUsername+" guessed "+" Merlin "+merlinUsername , Toast.LENGTH_SHORT).show();
-                        }
-                        else {
-                            Toast.makeText(getApplicationContext(), "Good team won. Assassin was "+assassinUsername+" and Merlin was "+merlinUsername, Toast.LENGTH_SHORT).show();
-                        }
+                        openGameOverDialog(command);
                         break;
                     default:
                         break;
@@ -473,15 +467,27 @@ public class PlayActivity extends AppCompatActivity {
             new BottomNavigationView.OnNavigationItemSelectedListener() {
                 @Override
                 public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                    openDialog(item);
+                    openMissionDialog(item);
                     return true;
                 }
             };
 
     //jos nije uradjeno - dijalog za misiju
-    public void openDialog(MenuItem item) {
+    public void openMissionDialog(MenuItem item) {
         missionDialog.selectedItem = item;
         missionDialog.show(getSupportFragmentManager(),"MISSION_DIALOG");
     }
 
+    public void openGameOverDialog(Command command) {
+        gameOverDialog = GameOverDialog.newInstance(command);
+        gameOverDialog.setCancelable(false);
+        gameOverDialog.show(getSupportFragmentManager(), "VOTE_DIALOG");
+    }
+    public void playAgain() {
+        startActivity(new Intent(PlayActivity.this,WaitActivity.class));
+    }
+
+    public void exit() {
+        System.out.println("EXIT");
+    }
 }
