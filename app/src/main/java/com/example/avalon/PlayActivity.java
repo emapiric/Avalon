@@ -471,8 +471,7 @@ public class PlayActivity extends AppCompatActivity {
                     return true;
                 }
             };
-
-    //jos nije uradjeno - dijalog za misiju
+    
     public void openMissionDialog(MenuItem item) {
         missionDialog.selectedItem = item;
         missionDialog.show(getSupportFragmentManager(),"MISSION_DIALOG");
