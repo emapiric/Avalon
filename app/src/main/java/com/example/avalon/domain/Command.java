@@ -7,13 +7,15 @@ public class Command {
     private String command;
     private String value;
     private String[] nominated;
-    private int negativeVotes;
+    private boolean accepted;
+    private Vote[] votes;
+    private int numberOfNegativeVotes;
 
-    public Command(String command, String value, String[] nominated, int negativeVotes) {
+    public Command(String command, String value, String[] nominated, int numberOfNegativeVotes) {
         this.command = command;
         this.value = value;
         this.nominated = nominated;
-        this.negativeVotes = negativeVotes;
+        this.numberOfNegativeVotes = numberOfNegativeVotes;
     }
 
     public Command(String command, String value, String[] nominated) {
@@ -25,6 +27,11 @@ public class Command {
     public Command(String command, String value) {
         this.command = command;
         this.value = value;
+    }
+
+    public Command(String command, boolean accepted) {
+        this.command = command;
+        this.accepted = accepted;
     }
 
     public String getCommand() {
@@ -51,12 +58,28 @@ public class Command {
         this.nominated = nominated;
     }
 
-    public int getNegativeVotes() {
-        return negativeVotes;
+    public int getNumberOfNegativeVotes() {
+        return numberOfNegativeVotes;
     }
 
-    public void setNegativeVotes(int negativeVotes) {
-        this.negativeVotes = negativeVotes;
+    public void setNumberOfNegativeVotes(int numberOfNegativeVotes) {
+        this.numberOfNegativeVotes = numberOfNegativeVotes;
+    }
+
+    public boolean isAccepted() {
+        return accepted;
+    }
+
+    public void setAccepted(boolean accepted) {
+        this.accepted = accepted;
+    }
+
+    public Vote[] getVotes() {
+        return votes;
+    }
+
+    public void setVotes(Vote[] votes) {
+        this.votes = votes;
     }
 
     @Override

@@ -19,6 +19,7 @@ import android.widget.Toast;
 import com.example.avalon.domain.Command;
 import com.example.avalon.domain.Mission;
 import com.example.avalon.domain.Player;
+import com.example.avalon.domain.Vote;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.gson.Gson;
 
@@ -252,8 +253,6 @@ public class PlayActivity extends AppCompatActivity {
         webSocketClient = new WebSocketClient(uri) {
             @Override
             public void onOpen() {
-                //prima se poruka s likom od servera
-
             }
 
             @Override
@@ -287,7 +286,7 @@ public class PlayActivity extends AppCompatActivity {
                     case "missionFinished":
                         String result = command.getValue();
                         Toast.makeText(getApplicationContext(), "Mission has "+result, Toast.LENGTH_SHORT).show();
-                        Mission mission = Mission.createMission(totalNumberOfPlayers, missionID, command.getNegativeVotes(), result, command.getNominated());
+                        Mission mission = Mission.createMission(totalNumberOfPlayers, missionID, command.getNumberOfNegativeVotes(), result, command.getNominated());
                         addMissionToDialog(mission);
                         missionID++;
                         break;
@@ -364,15 +363,15 @@ public class PlayActivity extends AppCompatActivity {
                 imageDrawable = getResources().getDrawable(R.drawable.pleb3);
                 break;
             case "Morgana":
-                tvInfo.setText("Mordred and Assassin are: " + Arrays.toString(command.getNominated()));
+                tvInfo.setText(Arrays.toString(command.getNominated()) + " are also in the evil team");
                 imageDrawable = getResources().getDrawable(R.drawable.morgana);
                 break;
             case "Mordred":
-                tvInfo.setText("Morgana and Assassin are: " + Arrays.toString(command.getNominated()));
+                tvInfo.setText(Arrays.toString(command.getNominated()) + " are also in the evil team");
                 imageDrawable = getResources().getDrawable(R.drawable.mordred);
                 break;
             case "Assassin":
-                tvInfo.setText("Morgana and Mordred are: " + Arrays.toString(command.getNominated()));
+                tvInfo.setText(Arrays.toString(command.getNominated()) + " are also in the evil team");
                 imageDrawable = getResources().getDrawable(R.drawable.assassin);
                 break;
             case "Oberon":
@@ -386,14 +385,6 @@ public class PlayActivity extends AppCompatActivity {
             ivCharacter.setImageDrawable(imageDrawable);
             //ivCharacter.setImageDrawable(Drawable.createFromPath("src\\main\\res\\drawable\\merlin.JPG"));
         }
-    }
-
-    private TextView getTextViewByPlayersName(String value) {
-        for (TextView tv : tvPlayersList) {
-            if(tv.getText().toString().equals(value))
-                return tv;
-        }
-        return null;
     }
 
     private void enablePlayerNomination() {
@@ -410,7 +401,7 @@ public class PlayActivity extends AppCompatActivity {
         voteDialog.show(getSupportFragmentManager(), "VOTE_DIALOG");
     }
 
-    public void sendVoteToServer(String vote) {
+    public void sendVoteToServer(boolean vote) {
         voteDialog.dismiss();
         Command command = new Command("vote",vote);
         String message = gson.toJson(command);
@@ -419,22 +410,31 @@ public class PlayActivity extends AppCompatActivity {
 
     //server posalje niz tipa yes yes no no pa onda na osnovu toga ucitaj kruzice
     public void showVoteNextToPlayer(Command command) {
-        int i = 0;
-        for (TextView tv : tvPlayersList) {
-            if (command.getNominated()[i].equals("YES"))
+        Vote[] votes = command.getVotes();
+        for (int i = 0; i<votes.length; i++) {
+            TextView tv = getTextViewByUsername(votes[i].getUsername());
+            if (votes[i].isAccepted())
                 tv.setCompoundDrawablesWithIntrinsicBounds(getResources().getDrawable(R.drawable.circle_green),null,null,getResources().getDrawable(R.drawable.player));
             else
                 tv.setCompoundDrawablesWithIntrinsicBounds(getResources().getDrawable(R.drawable.circle_red),null,null,getResources().getDrawable(R.drawable.player));
-            i++;
         }
-//        String playersName = command.getNominated()[0];
-//        TextView tv = getTextViewByPlayersName(playersName);
-//        if (command.getValue().equals("YES"))
-//            tv.setCompoundDrawablesWithIntrinsicBounds(getResources().getDrawable(R.drawable.circle_green),null,null,getResources().getDrawable(R.drawable.player));
-//        else
-//            tv.setCompoundDrawablesWithIntrinsicBounds(getResources().getDrawable(R.drawable.circle_red),null,null,getResources().getDrawable(R.drawable.player));
+//        int i = 0;
+//        for (TextView tv : tvPlayersList) {
+//            if (command.getVotes()[i].isAccepted())
+//                tv.setCompoundDrawablesWithIntrinsicBounds(getResources().getDrawable(R.drawable.circle_green),null,null,getResources().getDrawable(R.drawable.player));
+//            else
+//                tv.setCompoundDrawablesWithIntrinsicBounds(getResources().getDrawable(R.drawable.circle_red),null,null,getResources().getDrawable(R.drawable.player));
+//            i++;
+//        }
     }
 
+    private TextView getTextViewByUsername(String username) {
+        for (TextView tv : tvPlayersList) {
+            if (tv.getText().toString().equals(username))
+                return tv;
+        }
+        return null;
+    }
     private boolean playerOnMission(String[] nominated) {
         for (String player :  nominated) {
             if (player.equals(username))
@@ -471,7 +471,7 @@ public class PlayActivity extends AppCompatActivity {
                     return true;
                 }
             };
-    
+
     public void openMissionDialog(MenuItem item) {
         missionDialog.selectedItem = item;
         missionDialog.show(getSupportFragmentManager(),"MISSION_DIALOG");

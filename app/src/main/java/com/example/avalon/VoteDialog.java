@@ -42,13 +42,13 @@ public class VoteDialog extends DialogFragment {
         btnYes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                parent.sendVoteToServer("YES");
+                parent.sendVoteToServer(true);
             }
         });
         btnNo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                parent.sendVoteToServer("NO");
+                parent.sendVoteToServer(false);
             }
         });
         return view;
@@ -60,13 +60,4 @@ public class VoteDialog extends DialogFragment {
         btnNo = view.findViewById(R.id.btn_no);
     }
 
-//    @Override
-//    public void onClick(View v) {
-//        PlayActivity parent = (PlayActivity)getActivity();
-//        if (getView().getId() == R.id.btn_yes) {
-//            parent.nomineesApproved("YES");
-//            return;
-//        }
-//        parent.nomineesApproved("NO");
-//    }
 }
