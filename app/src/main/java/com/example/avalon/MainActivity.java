@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
 
     public static Player player;
     public static WebSocketClient webSocketClient;
-    public static final String SERVER = "ws://localhost:9000/Avalon/Server";
+    public static final String SERVER = "ws://178.223.63.79:9000/Avalon/Server";
     private Gson gson = new Gson();
     private Service service = new ServiceImpl();
     private Logger logger =  Logger.getLogger(this.getClass().getName());

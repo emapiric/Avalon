@@ -72,7 +72,7 @@ public class PlayActivity extends AppCompatActivity {
         setContentView(R.layout.activity_play);
 
         //ucitaj broj igraca
-        totalNumberOfPlayers = WaitActivity.playerNames.size();
+        totalNumberOfPlayers = WaitActivity.playerNames.size()+1;
         missionID = 1;
 
         //hardkod za numberofplayers
@@ -226,7 +226,8 @@ public class PlayActivity extends AppCompatActivity {
     }
 
     private void loadNamesToTextViews() {
-        for (int i = 0; i < tvPlayersList.size(); i++) {
+        tvPlayersList.get(0).setText(username);
+        for (int i = 1; i < tvPlayersList.size(); i++) {
             tvPlayersList.get(i).setText(WaitActivity.playerNames.get(i));
         }
     }
