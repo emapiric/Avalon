@@ -401,9 +401,9 @@ public class PlayActivity extends AppCompatActivity {
         voteDialog.show(getSupportFragmentManager(), "VOTE_DIALOG");
     }
 
-    public void sendVoteToServer(boolean vote) {
+    public void sendVoteToServer(String commandForServer, boolean vote) {
         voteDialog.dismiss();
-        Command command = new Command("vote",vote);
+        Command command = new Command(commandForServer,vote);
         String message = gson.toJson(command);
         webSocketClient.send(message);
     }

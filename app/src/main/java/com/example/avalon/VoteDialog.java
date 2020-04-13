@@ -21,6 +21,8 @@ public class VoteDialog extends DialogFragment {
     Button btnYes;
     Button btnNo;
     Command command;
+    String commandForServer;
+
     public static VoteDialog newInstance(Command command) {
         VoteDialog voteDialog = new VoteDialog();
         voteDialog.command = command;
@@ -34,21 +36,23 @@ public class VoteDialog extends DialogFragment {
         findViews(view);
         if (command.getCommand().equals("nominated")) {
             tvInfo.setText(command.getValue()+" nominated " + Arrays.toString(command.getNominated())+"\nDo you agree to send them on a mission?");
+            commandForServer = "voteForMission";
         }
         //u suprotnom je u pitanju komanda za obaranje/prolaz misije
         else {
             tvInfo.setText("Do you want this mission to pass?");
+            commandForServer = "voteInMission";
         }
         btnYes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                parent.sendVoteToServer(true);
+                parent.sendVoteToServer(commandForServer, true);
             }
         });
         btnNo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                parent.sendVoteToServer(false);
+                parent.sendVoteToServer(commandForServer, false);
             }
         });
         return view;
