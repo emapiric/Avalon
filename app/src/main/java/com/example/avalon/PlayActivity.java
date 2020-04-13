@@ -268,7 +268,7 @@ public class PlayActivity extends AppCompatActivity {
             public void onTextReceived(String message) {
                 Command command = gson.fromJson(message, Command.class);
                 switch (command.getCommand()) {
-                    case "role" :
+                    case "roll" :
                         role = command.getValue();
                         setImageAndInfo(role, command);
                         break;
