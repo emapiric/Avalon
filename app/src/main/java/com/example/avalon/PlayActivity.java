@@ -228,7 +228,7 @@ public class PlayActivity extends AppCompatActivity {
     private void loadNamesToTextViews() {
         tvPlayersList.get(0).setText(username);
         for (int i = 1; i < tvPlayersList.size(); i++) {
-            tvPlayersList.get(i).setText(WaitActivity.playerNames.get(i));
+            tvPlayersList.get(i).setText(WaitActivity.playerNames.get(i-1));
         }
     }
 
