@@ -7,9 +7,17 @@ public class Command {
     private String command;
     private String value;
     private String[] nominated;
+    private Boolean[] votes;
     private boolean accepted;
-    private Vote[] votes;
     private int numberOfNegativeVotes;
+
+    public Boolean[] getVotes() {
+        return votes;
+    }
+
+    public void setVotes(Boolean[] votes) {
+        this.votes = votes;
+    }
 
     public Command(String command, String value, String[] nominated, int numberOfNegativeVotes) {
         this.command = command;
@@ -74,13 +82,6 @@ public class Command {
         this.accepted = accepted;
     }
 
-    public Vote[] getVotes() {
-        return votes;
-    }
-
-    public void setVotes(Vote[] votes) {
-        this.votes = votes;
-    }
 
     @Override
     public String toString() {

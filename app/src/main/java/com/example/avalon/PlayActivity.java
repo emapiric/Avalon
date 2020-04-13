@@ -2,10 +2,8 @@ package com.example.avalon;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentManager;
 
 import android.content.Intent;
-import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -19,7 +17,6 @@ import android.widget.Toast;
 import com.example.avalon.domain.Command;
 import com.example.avalon.domain.Mission;
 import com.example.avalon.domain.Player;
-import com.example.avalon.domain.Vote;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.gson.Gson;
 
@@ -91,6 +88,7 @@ public class PlayActivity extends AppCompatActivity {
         visibleInfo = true;
 
         SERVER = WaitActivity.SERVER + "/Game";
+        createWebSocketClient();
 
     //    HARDKODOVANJE ZA TESTIRANJE SETIMAGEANDINFO
 //        String[] info = {"zli1", "zli2"};
@@ -169,15 +167,18 @@ public class PlayActivity extends AppCompatActivity {
             nominatedPlayers.remove(nominatedPlayer);
             return false;
         }
-        if (nominatedPlayersListFull() || missionID == 0) {
+        if (nominatedPlayersListFull() || (missionID == 0 && nominatedPlayers.size()>0)) {
             Toast.makeText(getApplicationContext(), "You selected the maximum number of players.", Toast.LENGTH_SHORT).show();
             return false;
         }
+
         nominatedPlayers.add(nominatedPlayer);
         return true;
     }
 
     private boolean nominatedPlayersListFull() {
+        if (missionID == 0)
+            return false;
         Mission mission = Mission.createMission(missionID, totalNumberOfPlayers);
         if (nominatedPlayers.size() == mission.getTotalNumberOfVotes())
             return true;
@@ -187,10 +188,17 @@ public class PlayActivity extends AppCompatActivity {
     private void sendNominatedPlayersToServer() {
         String[] nominatedPlayersArray = new String[nominatedPlayers.size()];
         nominatedPlayers.toArray(nominatedPlayersArray);
-      //  Command command = new Command("nominate", "username",nominatedPlayersArray);
-        Command command = new Command("nominated", username,nominatedPlayersArray);
+        String commandForServer = setCommandForServer();
+        Command command = new Command(commandForServer, username,nominatedPlayersArray);
         String message = gson.toJson(command);
         webSocketClient.send(message);
+    }
+
+    private String setCommandForServer() {
+        if (missionID == 0)
+            return "guessMerlin";
+        else
+            return "nominated";
     }
 
     public void deletePlayerViews(int n) {
@@ -410,22 +418,15 @@ public class PlayActivity extends AppCompatActivity {
 
     //server posalje niz tipa yes yes no no pa onda na osnovu toga ucitaj kruzice
     public void showVoteNextToPlayer(Command command) {
-        Vote[] votes = command.getVotes();
-        for (int i = 0; i<votes.length; i++) {
-            TextView tv = getTextViewByUsername(votes[i].getUsername());
-            if (votes[i].isAccepted())
+        String[] playerNames = command.getNominated();
+        Boolean[] playerVotes = command.getVotes();
+        for (int i = 0; i<playerNames.length; i++) {
+            TextView tv = getTextViewByUsername(playerNames[i]);
+            if (playerVotes[i])
                 tv.setCompoundDrawablesWithIntrinsicBounds(getResources().getDrawable(R.drawable.circle_green),null,null,getResources().getDrawable(R.drawable.player));
             else
                 tv.setCompoundDrawablesWithIntrinsicBounds(getResources().getDrawable(R.drawable.circle_red),null,null,getResources().getDrawable(R.drawable.player));
         }
-//        int i = 0;
-//        for (TextView tv : tvPlayersList) {
-//            if (command.getVotes()[i].isAccepted())
-//                tv.setCompoundDrawablesWithIntrinsicBounds(getResources().getDrawable(R.drawable.circle_green),null,null,getResources().getDrawable(R.drawable.player));
-//            else
-//                tv.setCompoundDrawablesWithIntrinsicBounds(getResources().getDrawable(R.drawable.circle_red),null,null,getResources().getDrawable(R.drawable.player));
-//            i++;
-//        }
     }
 
     private TextView getTextViewByUsername(String username) {
