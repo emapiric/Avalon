@@ -110,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
                     player = gson.fromJson(message, Player.class);
                     System.out.println("RECEVED FROM SERVER: " + message);
                 }catch (Exception e){
-                    System.out.println("DRUGI PEDER");
+                    System.out.println("DRUGI PEDER 1.0");
                     System.out.println(e.getMessage());
                     System.out.println(e.getStackTrace());
                 }

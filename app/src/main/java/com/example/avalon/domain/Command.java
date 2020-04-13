@@ -2,6 +2,8 @@ package com.example.avalon.domain;
 
 import java.util.Arrays;
 
+import androidx.annotation.NonNull;
+
 public class Command {
 
     private String command;
@@ -40,6 +42,15 @@ public class Command {
     public Command(String command, boolean accepted) {
         this.command = command;
         this.accepted = accepted;
+    }
+
+    public Command(String command, String value, String[] nominated, Boolean[] votes, boolean accepted, int numberOfNegativeVotes) {
+        this.command = command;
+        this.value = value;
+        this.nominated = nominated;
+        this.votes = votes;
+        this.accepted = accepted;
+        this.numberOfNegativeVotes = numberOfNegativeVotes;
     }
 
     public String getCommand() {
@@ -82,14 +93,15 @@ public class Command {
         this.accepted = accepted;
     }
 
-
     @Override
     public String toString() {
         return "Command{" +
                 "command='" + command + '\'' +
                 ", value='" + value + '\'' +
                 ", nominated=" + Arrays.toString(nominated) +
+                ", accepted=" + accepted +
+                ", numberOfNegativeVotes=" + numberOfNegativeVotes +
+                ", votes=" + Arrays.toString(votes) +
                 '}';
     }
-
 }

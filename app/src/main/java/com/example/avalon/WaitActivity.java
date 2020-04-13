@@ -114,19 +114,17 @@ public class WaitActivity extends AppCompatActivity {
 
             @Override
             public void onTextReceived(String message) {
-                try {
+//                try {
                     if(message.equals("startGame")){
                         startActivity(new Intent(WaitActivity.this,PlayActivity.class));
                         return;
                     }
-//                    player = gson.fromJson(message, Player.class);
                     System.out.println("SPISAK IGRACA: " + message);
                     String[] players = message.split(",");
                     playerNames.clear();
                     for (int i = 0; i < players.length; i++ ) {
                         if(!players[i].equals(player.getUsername())) {
                             playerNames.add(players[i]);
-                            System.out.println(i + ". igrac je " + players[i]);
                         }
                     }
                     new Handler(Looper.getMainLooper()).post(new Runnable() { // Tried new Handler(Looper.myLopper()) also
@@ -136,11 +134,11 @@ public class WaitActivity extends AppCompatActivity {
                         }
                     });
 
-                }catch (Exception e){
-                    System.out.println("DRUGI PEDER");
-                    System.out.println(e.getMessage());
-                    System.out.println(e.getStackTrace());
-                }
+//                }catch (Exception e){
+//                    System.out.println("DRUGI PEDER");
+//                    System.out.println(e.getMessage());
+//                    System.out.println(e.getStackTrace());
+//                }
             }
 
             @Override

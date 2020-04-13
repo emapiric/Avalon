@@ -267,9 +267,11 @@ public class PlayActivity extends AppCompatActivity {
             @Override
             public void onTextReceived(String message) {
                 Command command = gson.fromJson(message, Command.class);
+                System.out.println("***" + command.toString() + "***");
                 switch (command.getCommand()) {
                     case "roll" :
                         role = command.getValue();
+                        System.out.println("***\nuloga: " + role + "\n***");
                         setImageAndInfo(role, command);
                         break;
                     case "onMove" :
