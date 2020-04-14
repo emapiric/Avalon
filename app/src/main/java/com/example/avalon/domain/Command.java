@@ -9,40 +9,43 @@ public class Command {
     private String command;
     private String value;
     private String[] nominated;
-    private Boolean[] votes;
     private boolean accepted;
     private int numberOfNegativeVotes;
+    private Boolean[]votes;
 
-    public Boolean[] getVotes() {
-        return votes;
+
+    public Command(String command,String[]nominated,Boolean [] votes){
+        this.command=command;
+        this.nominated=nominated;
+        this.votes=votes;
     }
-
-    public void setVotes(Boolean[] votes) {
-        this.votes = votes;
+    public Command(String command, String value, String...nominated) {
+        this.command = command;
+        this.value = value;
+        this.nominated = nominated;
     }
-
     public Command(String command, String value, String[] nominated, int numberOfNegativeVotes) {
         this.command = command;
         this.value = value;
         this.nominated = nominated;
-        this.numberOfNegativeVotes = numberOfNegativeVotes;
+        this.numberOfNegativeVotes=numberOfNegativeVotes;
     }
-
-    public Command(String command, String value, String[] nominated) {
-        this.command = command;
-        this.value = value;
-        this.nominated = nominated;
-    }
-
     public Command(String command, String value) {
         this.command = command;
         this.value = value;
     }
-
     public Command(String command, boolean accepted) {
         this.command = command;
         this.accepted = accepted;
     }
+
+    public Command(String command,String[]nominated,boolean accepted){
+
+        this.command=command;
+        this.nominated=nominated;
+        this.accepted=accepted;
+    }
+/*
 
     public Command(String command, String value, String[] nominated, Boolean[] votes, boolean accepted, int numberOfNegativeVotes) {
         this.command = command;
@@ -52,7 +55,14 @@ public class Command {
         this.accepted = accepted;
         this.numberOfNegativeVotes = numberOfNegativeVotes;
     }
+*/
+    public Boolean[] getVotes() {
+    return votes;
+    }
 
+    public void setVotes(Boolean[] votes) {
+        this.votes = votes;
+    }
     public String getCommand() {
         return command;
     }

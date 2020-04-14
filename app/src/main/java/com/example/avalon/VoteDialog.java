@@ -64,4 +64,7 @@ public class VoteDialog extends DialogFragment {
         btnNo = view.findViewById(R.id.btn_no);
     }
 
+
+
+
 }

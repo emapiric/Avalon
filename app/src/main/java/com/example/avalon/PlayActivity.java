@@ -223,6 +223,7 @@ public class PlayActivity extends AppCompatActivity {
         for (int i = tvPlayersList.size()-1; i >= n; i--) {
             tvPlayersList.remove(i);
         }
+
     }
 
     private void loadNamesToTextViews() {
