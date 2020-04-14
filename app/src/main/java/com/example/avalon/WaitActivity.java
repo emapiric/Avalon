@@ -48,6 +48,7 @@ public class WaitActivity extends AppCompatActivity {
 
         findViews();
 
+
         if(player.getCommand().equals("enterRoom"))
             btnStart.setVisibility(View.INVISIBLE);
         else

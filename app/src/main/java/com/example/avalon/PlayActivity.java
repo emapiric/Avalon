@@ -6,6 +6,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -62,6 +64,8 @@ public class PlayActivity extends AppCompatActivity {
     public VoteDialog voteDialog;
     MissionDialog missionDialog = new MissionDialog();
     GameOverDialog gameOverDialog;
+
+    Command command;
 
     int missionID;
     int totalNumberOfPlayers;
@@ -267,13 +271,18 @@ public class PlayActivity extends AppCompatActivity {
 
             @Override
             public void onTextReceived(String message) {
-                Command command = gson.fromJson(message, Command.class);
-                System.out.println("***" + command.toString() + "***");
+                command = gson.fromJson(message, Command.class);
+                System.out.println("***\n" + command.toString() + "\n***");
                 switch (command.getCommand()) {
-                    case "roll" :
+                    case "role" :
                         role = command.getValue();
-                        System.out.println("***\nuloga: " + role + "\n***");
-                        setImageAndInfo(role, command);
+//                        System.out.println("***\nuloga: " + role + "\n***");
+                        new Handler(Looper.getMainLooper()).post(new Runnable() { // Tried new Handler(Looper.myLopper()) also
+                            @Override
+                            public void run() {
+                                setImageAndInfo(role, command);
+                            }
+                        });
                         break;
                     case "onMove" :
                         String playerOnMove = command.getValue();
