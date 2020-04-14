@@ -56,7 +56,7 @@ public class PlayActivity extends AppCompatActivity {
     private Gson gson = new Gson();
     String username = MainActivity.player.getUsername();
     //hardkod za username
-    //String username = "username";
+   // String username = "username";
     String role;
     ArrayList<String> nominatedPlayers;
     public VoteDialog voteDialog;
@@ -76,7 +76,7 @@ public class PlayActivity extends AppCompatActivity {
         missionID = 1;
 
         //hardkod za numberofplayers
-        //totalNumberOfPlayers = 5;
+       // totalNumberOfPlayers = 5;
 
         //INICIJALIZACIJA VIEW-OVA I BRISANJE NEPOTREBNIH PIJUNA
         //PARAMETAR - BROJ IGRACA
