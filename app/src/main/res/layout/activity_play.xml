@@ -33,7 +33,6 @@
             android:id="@+id/iv_character"
             android:layout_width="wrap_content"
             android:layout_height="200dp"
-            android:src="@drawable/morgana"
             android:layout_margin="10dp"
             android:contentDescription="Character picture"
             android:layout_gravity="center"/>
