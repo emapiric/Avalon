@@ -73,8 +73,8 @@ public class PlayActivity extends AppCompatActivity {
 
         //ucitaj broj igraca
         totalNumberOfPlayers = WaitActivity.playerNames.size()+1;
-        missionID = 0;
-
+        missionID = 1;
+        System.out.println("play on create: " +totalNumberOfPlayers);
         //hardkod za numberofplayers
         //totalNumberOfPlayers = 5;
 
@@ -206,7 +206,8 @@ public class PlayActivity extends AppCompatActivity {
     private boolean nominatedPlayersListFull() {
         if (missionID == 0)
             return false;
-        Mission mission = Mission.createMission(missionID, totalNumberOfPlayers);
+        System.out.println("nominatedplayrsfull: " +totalNumberOfPlayers);
+        Mission mission = Mission.createMission(totalNumberOfPlayers, missionID);
         if (nominatedPlayers.size() == mission.getTotalNumberOfVotes())
             return true;
         return false;
@@ -379,6 +380,11 @@ public class PlayActivity extends AppCompatActivity {
                                 playerOnMove = command.getValue();
                                 System.out.println("onMove se pokrenulo");
                                 Toast.makeText(getApplicationContext(), playerOnMove+" on move", Toast.LENGTH_LONG).show();
+                                try {
+                                    Thread.sleep(500);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
                                 if (playerOnMove.equals(username)) {
                                     Toast.makeText(getApplicationContext(), "Select players for the quest", Toast.LENGTH_LONG).show();
                                     enablePlayerNomination();
@@ -391,22 +397,23 @@ public class PlayActivity extends AppCompatActivity {
                                 showVoteNextToPlayer(command);
                                 break;
                             case "missionStarted":
-                                Toast.makeText(getApplicationContext(), "Mission in progress", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getApplicationContext(), "Mission in progress", Toast.LENGTH_LONG).show();
                                 if (playerOnMission(command.getNominated())) {
                                     openVoteDialog(command);
                                 }
                                 break;
                             case "missionFinished":
                                 String result = command.getValue();
-                                Toast.makeText(getApplicationContext(), "Mission has "+result, Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getApplicationContext(), "Mission has "+result, Toast.LENGTH_LONG).show();
                                 Mission mission = Mission.createMission(totalNumberOfPlayers, missionID, command.getNumberOfNegativeVotes(), result, command.getNominated());
                                 addMissionToDialog(mission);
                                 missionID++;
                                 break;
                             case "gameOver":
                                 if (command.getValue().equals("Good")) {
+                                    Toast.makeText(getApplicationContext(), "Good team has won", Toast.LENGTH_LONG).show();
                                     if (role.equals("Assassin")) {
-                                        Toast.makeText(getApplicationContext(), "Select Merlin", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(getApplicationContext(), "Select Merlin", Toast.LENGTH_LONG).show();
                                         missionID = 0;
                                         enablePlayerNomination();
                                     }

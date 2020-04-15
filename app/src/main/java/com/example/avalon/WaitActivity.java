@@ -1,8 +1,10 @@
 package com.example.avalon;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import tech.gusavila92.websocketclient.WebSocketClient;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -173,6 +175,27 @@ public class WaitActivity extends AppCompatActivity {
 //        webSocketClient.addHeader("Origin", "http://developer.example.com");
 //        webSocketClient.enableAutomaticReconnection(5000);
         webSocketClient.connect();
+    }
+
+    @Override
+    public void onBackPressed() {
+        new AlertDialog.Builder(this)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setTitle("Closing Activity")
+                .setMessage("Are you sure you want leave this room?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener()
+                {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        System.out.println("KLIKNUO DA UGASI");
+                        webSocketClient.send("leave");
+                        webSocketClient.close();
+                        finish();
+                    }
+
+                })
+                .setNegativeButton("No", null)
+                .show();
     }
 
 //    private void startUpdateing() {
