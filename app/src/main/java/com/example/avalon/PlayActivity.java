@@ -236,8 +236,11 @@ public class PlayActivity extends AppCompatActivity {
         Command command = null;
         if (commandForServer.equals("nominated"))
             command = new Command(commandForServer, username, nominatedPlayersArray);
-        else if (commandForServer.equals("guessMerlin"))
-            command = new Command(commandForServer, nominatedPlayersArray.toString());
+        else if (commandForServer.equals("guessMerlin")) {
+            String name = nominatedPlayersArray.toString();
+            command = new Command(commandForServer, name.substring(1, name.length()-1));
+            System.out.println(name.substring(1, name.length()-1));
+        }
         return command;
     }
 
