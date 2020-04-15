@@ -35,7 +35,7 @@ public class VoteDialog extends DialogFragment {
         final PlayActivity parent = (PlayActivity)getActivity();
         findViews(view);
         if (command.getCommand().equals("nominated")) {
-            tvInfo.setText(command.getValue()+" nominated " + Arrays.toString(command.getNominated())+"\nDo you agree to send them on a mission?");
+            tvInfo.setText(parent.playerOnMove+" nominated " + Arrays.toString(command.getNominated())+"\nDo you agree to send them on a mission?");
             commandForServer = "voteForMission";
         }
         //u suprotnom je u pitanju komanda za obaranje/prolaz misije
