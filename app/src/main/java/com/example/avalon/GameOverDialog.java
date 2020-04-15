@@ -36,7 +36,7 @@ public class GameOverDialog extends DialogFragment {
         if (command.getCommand().equals("gameOver"))
             tvInfo.setText(command.getValue() + " team has won the game.");
         //u suprotnom je komanda merlinGuessed i proveravamo da li je pogodjen ili ne
-        else if (command.getValue().equals("Yes"))
+        else if (command.isAccepted())
             tvInfo.setText("Merlin guessed. Evil team has won the game.\nAssassin and Merlin were "+command.getNominated()[0]+command.getNominated()[1]);
         else
             tvInfo.setText("Merlin not guessed. Good team has won the game.\nAssassin and Merlin were "+command.getNominated()[0]+command.getNominated()[1]);

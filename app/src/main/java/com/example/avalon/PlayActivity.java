@@ -32,43 +32,39 @@ import tech.gusavila92.websocketclient.WebSocketClient;
 
 public class PlayActivity extends AppCompatActivity {
 
-    //Lista u koju ce se ucitati svi igraci kako bi se posle postavila imena u viewove
-    List<Player> players;
-    //vidljivost slike i informacija
-    boolean visibleInfo;
+    //View-ovi
+    TextView tvYouAre; //TextView za You Are
+    TextView tvInfo;  //TextView u koji se upisuju dodatne informacije o igracima (npr za Merlina ko su zlikovci)
+    ImageView ivCharacter;  //ImageView u koji se smesta slika lika
+    ArrayList<TextView> tvPlayersList = new ArrayList<>(); //Lista TextViewova koji sadrze imena igraca i slicice pijuna
+    BottomNavigationView navbarMission;  //NavigationBar za misije
+    Button btnHideInfo; //Button za sakrivanje informacija (slike lika i podataka)
+    Button btnNominate;   //Button za slanje nominovanih serveru
 
-    //TextView za You Are
-    TextView tvYouAre;
-    //TextView u koji se upisuju dodatne informacije o igracima (npr za Merlina ko su zlikovci)
-    TextView tvInfo;
-    //ImageView u koji se smesta slika lika
-    ImageView ivCharacter;
-    //Lista TextViewova koji sadrze imena igraca i slicice pijuna
-    //prosto da nemamo 5 razlicitih TextView polja za sve nego ovako da prolazimo kroz njih
-    ArrayList<TextView> tvPlayersList = new ArrayList<>();
-    //NavigationBar za misije
-    BottomNavigationView navbarMission;
-    //dugme za hide info
-    Button btnHideInfo;
-    //dugme za slanje nominacije
-    Button btnNominate;
+    //Dialog box-ovi
+    VoteDialog voteDialog;
+    MissionDialog missionDialog = new MissionDialog(); //ovaj je odmah inicijalizovan jer se nikad ne pravi novi nego se samo razlicite informacije prikazuju
+    GameOverDialog gameOverDialog;
 
     String SERVER;
     WebSocketClient webSocketClient;
     private Gson gson = new Gson();
+
+    List<Player> players; //Lista igraca
     String username = MainActivity.player.getUsername();
     //hardkod za username
-   // String username = "username";
+    //String username = "username";
     String role;
-    ArrayList<String> nominatedPlayers;
-    public VoteDialog voteDialog;
-    MissionDialog missionDialog = new MissionDialog();
-    GameOverDialog gameOverDialog;
-
-    Command command;
 
     int missionID;
     int totalNumberOfPlayers;
+
+    boolean visibleInfo; //vidljivost slike i informacija
+    boolean clickablePlayerIcons; //da li je dozvoljen klik na pijuna ili ne
+
+    Command command;
+    String playerOnMove;
+    ArrayList<String> nominatedPlayers = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,16 +73,16 @@ public class PlayActivity extends AppCompatActivity {
 
         //ucitaj broj igraca
         totalNumberOfPlayers = WaitActivity.playerNames.size()+1;
-        missionID = 1;
+        missionID = 0;
 
         //hardkod za numberofplayers
-       // totalNumberOfPlayers = 5;
+        //totalNumberOfPlayers = 5;
 
         //INICIJALIZACIJA VIEW-OVA I BRISANJE NEPOTREBNIH PIJUNA
         //PARAMETAR - BROJ IGRACA
         findViews(totalNumberOfPlayers);
-        setListeners();
         loadNamesToTextViews();
+        setListeners();
 
         navbarMission.setOnNavigationItemSelectedListener(navBarMissionListener);
         visibleInfo = true;
@@ -100,7 +96,7 @@ public class PlayActivity extends AppCompatActivity {
 //        setImageAndInfo("Merlin", command);
 
         //HARDKODOVANJE ZA TESTIRANJE NOMINACIJE
-//        enablePlayerNomination();
+        //enablePlayerNomination();
 
         //HARDKODOVANJE ZA TESTIRANJE GLASANJA ZA NOMINOVANE
 //        String[] nominated = {"Milos","Ema"};
@@ -132,46 +128,73 @@ public class PlayActivity extends AppCompatActivity {
         tvPlayersList.add((TextView) findViewById(R.id.tv_player10));
         btnHideInfo = findViewById(R.id.btn_hide_info);
         btnNominate = findViewById(R.id.btn_nominate);
-        //BRISANJE TJ. SAKRIVANJE VISKA PIJUNA
+
         deletePlayerViews(n);
     }
 
     private void setListeners() {
+        btnHideInfo.setOnClickListener(btnHideInfoOnClickListener);
         for (TextView tv : tvPlayersList) {
-            tv.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    TextView clickedTextView = (TextView) v;
-                    String nominatedPlayer = clickedTextView.getText().toString();
-                    if (addToNominatedPlayers(nominatedPlayer)) {
-                        clickedTextView.setCompoundDrawablesWithIntrinsicBounds(null, null, null, getResources().getDrawable(R.drawable.player_nominated));
-                    }
-                    else{
-                        clickedTextView.setCompoundDrawablesWithIntrinsicBounds(null, null, null, getResources().getDrawable(R.drawable.player));
-                    }
-                }
-            });
+            tv.setOnClickListener(playerIconOnClickListener);
         }
+        btnNominate.setOnClickListener(btnNominateOnClickListener);
+    }
 
-        btnNominate.setOnClickListener(new View.OnClickListener() {
+    View.OnClickListener btnHideInfoOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if (visibleInfo) {
+                tvYouAre.setVisibility(View.INVISIBLE);
+                ivCharacter.setVisibility(View.INVISIBLE);
+                tvInfo.setVisibility(View.INVISIBLE);
+                btnHideInfo.setText("SHOW INFO");
+                visibleInfo = false;
+            }
+            else {
+                tvYouAre.setVisibility(View.VISIBLE);
+                ivCharacter.setVisibility(View.VISIBLE);
+                ivCharacter.setVisibility(View.VISIBLE);
+                btnHideInfo.setText("HIDE INFO");
+                visibleInfo = true;
+            }
+        }
+    };
+    View.OnClickListener btnNominateOnClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 sendNominatedPlayersToServer();
+                clickablePlayerIcons = false;
                 for (TextView tv : tvPlayersList) {
-                    tv.setClickable(false);
                     tv.setCompoundDrawablesWithIntrinsicBounds(null, null, null, getResources().getDrawable(R.drawable.player));
                 }
                 v.setVisibility(View.INVISIBLE);
             }
-        });
-    }
+    };
+
+    View.OnClickListener playerIconOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if (!clickablePlayerIcons)
+                return;
+            TextView clickedTextView = (TextView) v;
+            String nominatedPlayer = clickedTextView.getText().toString();
+            if (addToNominatedPlayers(nominatedPlayer)) {
+                clickedTextView.setCompoundDrawablesWithIntrinsicBounds(null, null, null, getResources().getDrawable(R.drawable.player_nominated));
+            }
+            else{
+                clickedTextView.setCompoundDrawablesWithIntrinsicBounds(null, null, null, getResources().getDrawable(R.drawable.player));
+            }
+        }
+    };
 
     private boolean addToNominatedPlayers(String nominatedPlayer) {
+        System.out.println(nominatedPlayers.size());
         if (nominatedPlayers.contains(nominatedPlayer)) {
             nominatedPlayers.remove(nominatedPlayer);
             return false;
         }
         if (nominatedPlayersListFull() || (missionID == 0 && nominatedPlayers.size()>0)) {
+            System.out.println("uslo");
             Toast.makeText(getApplicationContext(), "You selected the maximum number of players.", Toast.LENGTH_SHORT).show();
             return false;
         }
@@ -190,12 +213,15 @@ public class PlayActivity extends AppCompatActivity {
     }
 
     private void sendNominatedPlayersToServer() {
+        String[] nominatedPlayersArray = convertListOfStringsToArray(nominatedPlayers);
+        Command command = createCommand(setCommandForServer(), nominatedPlayersArray);
+        sendCommand(command);
+    }
+
+    private String[] convertListOfStringsToArray(ArrayList<String> nominatedPlayers) {
         String[] nominatedPlayersArray = new String[nominatedPlayers.size()];
         nominatedPlayers.toArray(nominatedPlayersArray);
-        String commandForServer = setCommandForServer();
-        Command command = new Command(commandForServer, username,nominatedPlayersArray);
-        String message = gson.toJson(command);
-        webSocketClient.send(message);
+        return nominatedPlayersArray;
     }
 
     private String setCommandForServer() {
@@ -203,6 +229,20 @@ public class PlayActivity extends AppCompatActivity {
             return "guessMerlin";
         else
             return "nominated";
+    }
+
+    private Command createCommand(String commandForServer, String[] nominatedPlayersArray) {
+        Command command = null;
+        if (commandForServer.equals("nominated"))
+            command = new Command(commandForServer, username, nominatedPlayersArray);
+        else if (commandForServer.equals("guessMerlin"))
+            command = new Command(commandForServer, nominatedPlayersArray.toString());
+        return command;
+    }
+
+    private void sendCommand(Command command) {
+        String message = gson.toJson(command);
+        webSocketClient.send(message);
     }
 
     public void deletePlayerViews(int n) {
@@ -237,22 +277,6 @@ public class PlayActivity extends AppCompatActivity {
         }
     }
 
-    public void hideInfo(View view) {
-        if (visibleInfo) {
-            tvYouAre.setVisibility(View.INVISIBLE);
-            ivCharacter.setVisibility(View.INVISIBLE);
-            tvInfo.setVisibility(View.INVISIBLE);
-            btnHideInfo.setText("SHOW INFO");
-            visibleInfo = false;
-        }
-        else {
-            tvYouAre.setVisibility(View.VISIBLE);
-            ivCharacter.setVisibility(View.VISIBLE);
-            ivCharacter.setVisibility(View.VISIBLE);
-            btnHideInfo.setText("HIDE INFO");
-            visibleInfo = true;
-        }
-    }
 
     private void createWebSocketClient() {
         URI uri;
@@ -269,67 +293,138 @@ public class PlayActivity extends AppCompatActivity {
             public void onOpen() {
             }
 
+//            @Override
+//            public void onTextReceived(String message) {
+//                command = gson.fromJson(message, Command.class);
+//                System.out.println("***\n" + command.toString() + "\n***");
+//                switch (command.getCommand()) {
+//                    case "role" :
+//                        role = command.getValue();
+////                        System.out.println("***\nuloga: " + role + "\n***");
+//                        new Handler(Looper.getMainLooper()).post(new Runnable() { // Tried new Handler(Looper.myLopper()) also
+//                            @Override
+//                            public void run() {
+//                                setImageAndInfo(role, command);
+//                            }
+//                        });
+//                        break;
+//                    case "onMove" :
+//                        playerOnMove = command.getValue();
+//                        System.out.println("onMove se pokrenulo");
+//                        //Toast.makeText(getApplicationContext(), playerOnMove+" on move", Toast.LENGTH_LONG).show();
+//                        new Handler(Looper.getMainLooper()).post(new Runnable() { // Tried new Handler(Looper.myLopper()) also
+//                            @Override
+//                            public void run() {
+//                                Toast.makeText(getApplicationContext(), playerOnMove+" on move", Toast.LENGTH_SHORT).show();
+//
+//                            }
+//                        });
+//                        if (playerOnMove.equals(username)) {
+//                            Toast.makeText(getApplicationContext(), "Select players for the quest", Toast.LENGTH_LONG).show();
+//                            enablePlayerNomination();
+//                        }
+//                        break;
+//                    case "nominated" :
+//                        openVoteDialog(command);
+//                        break;
+//                    case "nominatedVote":
+//                        showVoteNextToPlayer(command);
+//                        break;
+//                    case "missionStarted":
+//                        Toast.makeText(getApplicationContext(), "Mission in progress", Toast.LENGTH_SHORT).show();
+//                        if (playerOnMission(command.getNominated())) {
+//                            openVoteDialog(command);
+//                        }
+//                        break;
+//                    case "missionFinished":
+//                        String result = command.getValue();
+//                        Toast.makeText(getApplicationContext(), "Mission has "+result, Toast.LENGTH_SHORT).show();
+//                        Mission mission = Mission.createMission(totalNumberOfPlayers, missionID, command.getNumberOfNegativeVotes(), result, command.getNominated());
+//                        addMissionToDialog(mission);
+//                        missionID++;
+//                        break;
+//                    case "gameOver":
+//                        if (command.getValue().equals("Good")) {
+//                            if (role.equals("Assassin")) {
+//                                Toast.makeText(getApplicationContext(), "Select Merlin", Toast.LENGTH_SHORT).show();
+//                                missionID = 0;
+//                                enablePlayerNomination();
+//                            }
+//                        }
+//                        else {
+//                            openGameOverDialog(command);
+//                        }
+//                        break;
+//                    case "merlinGuessed":
+//                        openGameOverDialog(command);
+//                        break;
+//                    default:
+//                        break;
+//                }
+//             }
+
             @Override
-            public void onTextReceived(String message) {
-                command = gson.fromJson(message, Command.class);
-                System.out.println("***\n" + command.toString() + "\n***");
-                switch (command.getCommand()) {
-                    case "role" :
-                        role = command.getValue();
-//                        System.out.println("***\nuloga: " + role + "\n***");
-                        new Handler(Looper.getMainLooper()).post(new Runnable() { // Tried new Handler(Looper.myLopper()) also
-                            @Override
-                            public void run() {
+            public void onTextReceived(final String message) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        command = gson.fromJson(message, Command.class);
+                        System.out.println("***\n" + command.toString() + "\n***");
+                        switch (command.getCommand()) {
+                            case "role" :
+                                role = command.getValue();
                                 setImageAndInfo(role, command);
-                            }
-                        });
-                        break;
-                    case "onMove" :
-                        String playerOnMove = command.getValue();
-                        Toast.makeText(getApplicationContext(), playerOnMove+" on move", Toast.LENGTH_SHORT).show();
-                        if (playerOnMove.equals(username)) {
-                            Toast.makeText(getApplicationContext(), "Select players for the quest", Toast.LENGTH_SHORT).show();
-                            enablePlayerNomination();
+                                break;
+                            case "onMove" :
+                                playerOnMove = command.getValue();
+                                System.out.println("onMove se pokrenulo");
+                                Toast.makeText(getApplicationContext(), playerOnMove+" on move", Toast.LENGTH_LONG).show();
+                                if (playerOnMove.equals(username)) {
+                                    Toast.makeText(getApplicationContext(), "Select players for the quest", Toast.LENGTH_LONG).show();
+                                    enablePlayerNomination();
+                                }
+                                break;
+                            case "nominated" :
+                                openVoteDialog(command);
+                                break;
+                            case "nominatedVote":
+                                showVoteNextToPlayer(command);
+                                break;
+                            case "missionStarted":
+                                Toast.makeText(getApplicationContext(), "Mission in progress", Toast.LENGTH_SHORT).show();
+                                if (playerOnMission(command.getNominated())) {
+                                    openVoteDialog(command);
+                                }
+                                break;
+                            case "missionFinished":
+                                String result = command.getValue();
+                                Toast.makeText(getApplicationContext(), "Mission has "+result, Toast.LENGTH_SHORT).show();
+                                Mission mission = Mission.createMission(totalNumberOfPlayers, missionID, command.getNumberOfNegativeVotes(), result, command.getNominated());
+                                addMissionToDialog(mission);
+                                missionID++;
+                                break;
+                            case "gameOver":
+                                if (command.getValue().equals("Good")) {
+                                    if (role.equals("Assassin")) {
+                                        Toast.makeText(getApplicationContext(), "Select Merlin", Toast.LENGTH_SHORT).show();
+                                        missionID = 0;
+                                        enablePlayerNomination();
+                                    }
+                                }
+                                else {
+                                    openGameOverDialog(command);
+                                }
+                                break;
+                            case "merlinGuessed":
+                                openGameOverDialog(command);
+                                break;
+                            default:
+                                break;
                         }
-                        break;
-                    case "nominated" :
-                        openVoteDialog(command);
-                        break;
-                    case "nominatedVote":
-                        showVoteNextToPlayer(command);
-                        break;
-                    case "missionStarted":
-                        Toast.makeText(getApplicationContext(), "Mission in progress", Toast.LENGTH_SHORT).show();
-                        if (playerOnMission(command.getNominated())) {
-                            openVoteDialog(command);
-                        }
-                        break;
-                    case "missionFinished":
-                        String result = command.getValue();
-                        Toast.makeText(getApplicationContext(), "Mission has "+result, Toast.LENGTH_SHORT).show();
-                        Mission mission = Mission.createMission(totalNumberOfPlayers, missionID, command.getNumberOfNegativeVotes(), result, command.getNominated());
-                        addMissionToDialog(mission);
-                        missionID++;
-                        break;
-                    case "gameOver":
-                        if (command.getValue().equals("Good")) {
-                            if (role.equals("Assassin")) {
-                                Toast.makeText(getApplicationContext(), "Select Merlin", Toast.LENGTH_SHORT).show();
-                                missionID = 0;
-                                enablePlayerNomination();
-                            }
-                        }
-                        else {
-                            openGameOverDialog(command);
-                        }
-                        break;
-                    case "merlinGuessed":
-                        openGameOverDialog(command);
-                        break;
-                    default:
-                        break;
-                }
-             }
+                    }
+                });
+
+            }
 
             @Override
             public void onBinaryReceived(byte[] data) {
@@ -404,15 +499,12 @@ public class PlayActivity extends AppCompatActivity {
 
         if (imageDrawable != null) {
             ivCharacter.setImageDrawable(imageDrawable);
-            //ivCharacter.setImageDrawable(Drawable.createFromPath("src\\main\\res\\drawable\\merlin.JPG"));
         }
     }
 
     private void enablePlayerNomination() {
-        nominatedPlayers = new ArrayList<>();
-        for (TextView tv : tvPlayersList) {
-            tv.setClickable(true);
-        }
+        nominatedPlayers.clear();
+        clickablePlayerIcons = true;
         btnNominate.setVisibility(View.VISIBLE);
     }
 
@@ -425,8 +517,7 @@ public class PlayActivity extends AppCompatActivity {
     public void sendVoteToServer(String commandForServer, boolean vote) {
         voteDialog.dismiss();
         Command command = new Command(commandForServer,vote);
-        String message = gson.toJson(command);
-        webSocketClient.send(message);
+        sendCommand(command);
     }
 
     //server posalje niz tipa yes yes no no pa onda na osnovu toga ucitaj kruzice
