@@ -6,13 +6,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -59,7 +58,7 @@ public class PlayActivity extends AppCompatActivity {
     int missionID;
     int totalNumberOfPlayers;
 
-    boolean visibleInfo; //vidljivost slike i informacija
+    boolean visibleInfo = true; //vidljivost slike i informacija
     boolean clickablePlayerIcons; //da li je dozvoljen klik na pijuna ili ne
 
     Command command;
@@ -71,32 +70,27 @@ public class PlayActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_play);
 
-        //ucitaj broj igraca
         totalNumberOfPlayers = WaitActivity.playerNames.size()+1;
         missionID = 1;
-        System.out.println("play on create: " +totalNumberOfPlayers);
-        //hardkod za numberofplayers
-        //totalNumberOfPlayers = 5;
 
-        //INICIJALIZACIJA VIEW-OVA I BRISANJE NEPOTREBNIH PIJUNA
-        //PARAMETAR - BROJ IGRACA
-        findViews(totalNumberOfPlayers);
+        findViews();
+        deletePlayerViews(totalNumberOfPlayers);
         loadNamesToTextViews();
         setListeners();
-
-        navbarMission.setOnNavigationItemSelectedListener(navBarMissionListener);
-        visibleInfo = true;
 
         SERVER = WaitActivity.SERVER + "/Game";
         createWebSocketClient();
 
-    //    HARDKODOVANJE ZA TESTIRANJE SETIMAGEANDINFO
+        //HARDKOD ZA NUMBER OF PLAYERS
+        //totalNumberOfPlayers = 5;
+
+       // HARDKODOVANJE ZA TESTIRANJE SETIMAGEANDINFO
 //        String[] info = {"zli1", "zli2"};
 //        Command command = new Command("com","val",info);
 //        setImageAndInfo("Merlin", command);
 
         //HARDKODOVANJE ZA TESTIRANJE NOMINACIJE
-        //enablePlayerNomination();
+       // enablePlayerNomination();
 
         //HARDKODOVANJE ZA TESTIRANJE GLASANJA ZA NOMINOVANE
 //        String[] nominated = {"Milos","Ema"};
@@ -109,9 +103,15 @@ public class PlayActivity extends AppCompatActivity {
 //        String result = command.getValue();
 //        Mission mission = Mission.createMission(totalNumberOfPlayers, missionID, command.getNegativeVotes(), result, command.getNominated());
 //        addMissionToDialog(mission);
+
+        //HARDKOD ZA GAMEOVER DIALOG
+//        Command command = new Command("gameOver", "command value");
+//        String[] niz = {"asasin username", "merlin username"};
+//        Command command2 = new Command("merlinGuessed",niz, true);
+//        openGameOverDialog(command2);
     }
 
-    private void findViews(int n) {
+    private void findViews() {
         tvYouAre = findViewById(R.id.tv_you_are);
         tvInfo = findViewById(R.id.tv_info);
         ivCharacter = findViewById(R.id.iv_character);
@@ -128,150 +128,30 @@ public class PlayActivity extends AppCompatActivity {
         tvPlayersList.add((TextView) findViewById(R.id.tv_player10));
         btnHideInfo = findViewById(R.id.btn_hide_info);
         btnNominate = findViewById(R.id.btn_nominate);
-
-        deletePlayerViews(n);
     }
 
-    private void setListeners() {
-        btnHideInfo.setOnClickListener(btnHideInfoOnClickListener);
-        for (TextView tv : tvPlayersList) {
-            tv.setOnClickListener(playerIconOnClickListener);
-        }
-        btnNominate.setOnClickListener(btnNominateOnClickListener);
-    }
-
-    View.OnClickListener btnHideInfoOnClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            if (visibleInfo) {
-                tvYouAre.setVisibility(View.INVISIBLE);
-                ivCharacter.setVisibility(View.INVISIBLE);
-                tvInfo.setVisibility(View.INVISIBLE);
-                btnHideInfo.setText("SHOW INFO");
-                visibleInfo = false;
-            }
-            else {
-                tvYouAre.setVisibility(View.VISIBLE);
-                ivCharacter.setVisibility(View.VISIBLE);
-                ivCharacter.setVisibility(View.VISIBLE);
-                btnHideInfo.setText("HIDE INFO");
-                visibleInfo = true;
-            }
-        }
-    };
-    View.OnClickListener btnNominateOnClickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                sendNominatedPlayersToServer();
-                clickablePlayerIcons = false;
-                for (TextView tv : tvPlayersList) {
-                    tv.setCompoundDrawablesWithIntrinsicBounds(null, null, null, getResources().getDrawable(R.drawable.player));
-                }
-                v.setVisibility(View.INVISIBLE);
-            }
-    };
-
-    View.OnClickListener playerIconOnClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            if (!clickablePlayerIcons)
-                return;
-            TextView clickedTextView = (TextView) v;
-            String nominatedPlayer = clickedTextView.getText().toString();
-            if (addToNominatedPlayers(nominatedPlayer)) {
-                clickedTextView.setCompoundDrawablesWithIntrinsicBounds(null, null, null, getResources().getDrawable(R.drawable.player_nominated));
-            }
-            else{
-                clickedTextView.setCompoundDrawablesWithIntrinsicBounds(null, null, null, getResources().getDrawable(R.drawable.player));
-            }
-        }
-    };
-
-    private boolean addToNominatedPlayers(String nominatedPlayer) {
-        System.out.println(nominatedPlayers.size());
-        if (nominatedPlayers.contains(nominatedPlayer)) {
-            nominatedPlayers.remove(nominatedPlayer);
-            return false;
-        }
-        if (nominatedPlayersListFull() || (missionID == 0 && nominatedPlayers.size()>0)) {
-            System.out.println("uslo");
-            Toast.makeText(getApplicationContext(), "You selected the maximum number of players.", Toast.LENGTH_SHORT).show();
-            return false;
-        }
-
-        nominatedPlayers.add(nominatedPlayer);
-        return true;
-    }
-
-    private boolean nominatedPlayersListFull() {
-        if (missionID == 0)
-            return false;
-        System.out.println("nominatedplayrsfull: " +totalNumberOfPlayers);
-        Mission mission = Mission.createMission(totalNumberOfPlayers, missionID);
-        if (nominatedPlayers.size() == mission.getTotalNumberOfVotes())
-            return true;
-        return false;
-    }
-
-    private void sendNominatedPlayersToServer() {
-        String[] nominatedPlayersArray = convertListOfStringsToArray(nominatedPlayers);
-        Command command = createCommand(setCommandForServer(), nominatedPlayersArray);
-        sendCommand(command);
-    }
-
-    private String[] convertListOfStringsToArray(ArrayList<String> nominatedPlayers) {
-        String[] nominatedPlayersArray = new String[nominatedPlayers.size()];
-        nominatedPlayers.toArray(nominatedPlayersArray);
-        return nominatedPlayersArray;
-    }
-
-    private String setCommandForServer() {
-        if (missionID == 0)
-            return "guessMerlin";
-        else
-            return "nominated";
-    }
-
-    private Command createCommand(String commandForServer, String[] nominatedPlayersArray) {
-        Command command = null;
-        if (commandForServer.equals("nominated"))
-            command = new Command(commandForServer, username, nominatedPlayersArray);
-        else if (commandForServer.equals("guessMerlin")) {
-            String name = nominatedPlayersArray.toString();
-            command = new Command(commandForServer, name.substring(1, name.length()-1));
-            System.out.println(name.substring(1, name.length()-1));
-        }
-        return command;
-    }
-
-    private void sendCommand(Command command) {
-        String message = gson.toJson(command);
-        webSocketClient.send(message);
-    }
-
-    public void deletePlayerViews(int n) {
-        if (n<9)  {
+    public void deletePlayerViews(int totalNumberOfPlayers) {
+        if (totalNumberOfPlayers<9)  {
             LinearLayout extraLinearLayout = findViewById(R.id.extraLinearLayout);
             extraLinearLayout.setVisibility(View.GONE);
         }
-        if (n==9) {
+        if (totalNumberOfPlayers==9) {
             TextView tvToHide = tvPlayersList.get(6);
             tvPlayersList.set(6,tvPlayersList.get(9));
             tvPlayersList.set(9,tvToHide);
         }
-        if (n==6 || n == 7) {
+        if (totalNumberOfPlayers==6 || totalNumberOfPlayers == 7) {
             TextView tvToHide = tvPlayersList.get(0);
             tvPlayersList.set(0,tvPlayersList.get(7));
             tvPlayersList.set(7,tvToHide);
         }
-        for (int i = n; i < 10; i++) {
+        for (int i = totalNumberOfPlayers; i < 10; i++) {
             tvPlayersList.get(i).setVisibility(View.INVISIBLE);
         }
         //BRISANJE VISKA IGRACA IZ LISTE
-        for (int i = tvPlayersList.size()-1; i >= n; i--) {
+        for (int i = tvPlayersList.size()-1; i >= totalNumberOfPlayers; i--) {
             tvPlayersList.remove(i);
         }
-
     }
 
     private void loadNamesToTextViews() {
@@ -281,6 +161,14 @@ public class PlayActivity extends AppCompatActivity {
         }
     }
 
+    private void setListeners() {
+        btnHideInfo.setOnClickListener(btnHideInfoOnClickListener);
+        for (TextView tv : tvPlayersList) {
+            tv.setOnClickListener(playerIconOnClickListener);
+        }
+        btnNominate.setOnClickListener(btnNominateOnClickListener);
+        navbarMission.setOnNavigationItemSelectedListener(navBarMissionListener);
+    }
 
     private void createWebSocketClient() {
         URI uri;
@@ -297,76 +185,6 @@ public class PlayActivity extends AppCompatActivity {
             public void onOpen() {
             }
 
-//            @Override
-//            public void onTextReceived(String message) {
-//                command = gson.fromJson(message, Command.class);
-//                System.out.println("***\n" + command.toString() + "\n***");
-//                switch (command.getCommand()) {
-//                    case "role" :
-//                        role = command.getValue();
-////                        System.out.println("***\nuloga: " + role + "\n***");
-//                        new Handler(Looper.getMainLooper()).post(new Runnable() { // Tried new Handler(Looper.myLopper()) also
-//                            @Override
-//                            public void run() {
-//                                setImageAndInfo(role, command);
-//                            }
-//                        });
-//                        break;
-//                    case "onMove" :
-//                        playerOnMove = command.getValue();
-//                        System.out.println("onMove se pokrenulo");
-//                        //Toast.makeText(getApplicationContext(), playerOnMove+" on move", Toast.LENGTH_LONG).show();
-//                        new Handler(Looper.getMainLooper()).post(new Runnable() { // Tried new Handler(Looper.myLopper()) also
-//                            @Override
-//                            public void run() {
-//                                Toast.makeText(getApplicationContext(), playerOnMove+" on move", Toast.LENGTH_SHORT).show();
-//
-//                            }
-//                        });
-//                        if (playerOnMove.equals(username)) {
-//                            Toast.makeText(getApplicationContext(), "Select players for the quest", Toast.LENGTH_LONG).show();
-//                            enablePlayerNomination();
-//                        }
-//                        break;
-//                    case "nominated" :
-//                        openVoteDialog(command);
-//                        break;
-//                    case "nominatedVote":
-//                        showVoteNextToPlayer(command);
-//                        break;
-//                    case "missionStarted":
-//                        Toast.makeText(getApplicationContext(), "Mission in progress", Toast.LENGTH_SHORT).show();
-//                        if (playerOnMission(command.getNominated())) {
-//                            openVoteDialog(command);
-//                        }
-//                        break;
-//                    case "missionFinished":
-//                        String result = command.getValue();
-//                        Toast.makeText(getApplicationContext(), "Mission has "+result, Toast.LENGTH_SHORT).show();
-//                        Mission mission = Mission.createMission(totalNumberOfPlayers, missionID, command.getNumberOfNegativeVotes(), result, command.getNominated());
-//                        addMissionToDialog(mission);
-//                        missionID++;
-//                        break;
-//                    case "gameOver":
-//                        if (command.getValue().equals("Good")) {
-//                            if (role.equals("Assassin")) {
-//                                Toast.makeText(getApplicationContext(), "Select Merlin", Toast.LENGTH_SHORT).show();
-//                                missionID = 0;
-//                                enablePlayerNomination();
-//                            }
-//                        }
-//                        else {
-//                            openGameOverDialog(command);
-//                        }
-//                        break;
-//                    case "merlinGuessed":
-//                        openGameOverDialog(command);
-//                        break;
-//                    default:
-//                        break;
-//                }
-//             }
-
             @Override
             public void onTextReceived(final String message) {
                 runOnUiThread(new Runnable() {
@@ -378,6 +196,7 @@ public class PlayActivity extends AppCompatActivity {
                             case "role" :
                                 role = command.getValue();
                                 setImageAndInfo(role, command);
+                                hideProgressBar();
                                 break;
                             case "onMove" :
                                 playerOnMove = command.getValue();
@@ -408,6 +227,11 @@ public class PlayActivity extends AppCompatActivity {
                             case "missionFinished":
                                 String result = command.getValue();
                                 Toast.makeText(getApplicationContext(), "Mission has "+result, Toast.LENGTH_LONG).show();
+                                try {
+                                    Thread.sleep(500);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
                                 Mission mission = Mission.createMission(totalNumberOfPlayers, missionID, command.getNumberOfNegativeVotes(), result, command.getNominated());
                                 addMissionToDialog(mission);
                                 missionID++;
@@ -433,38 +257,30 @@ public class PlayActivity extends AppCompatActivity {
                         }
                     }
                 });
-
             }
-
             @Override
             public void onBinaryReceived(byte[] data) {
                 System.out.println("onBinaryReceived");
             }
-
             @Override
             public void onPingReceived(byte[] data) {
                 System.out.println("onPingReceived");
             }
-
             @Override
             public void onPongReceived(byte[] data) {
                 System.out.println("onPongReceived");
             }
-
             @Override
             public void onException(Exception e) {
                 System.out.println(e.getMessage());
             }
-
             @Override
             public void onCloseReceived() {
                 System.out.println("onCloseReceived");
             }
         };
-
         webSocketClient.connect();
     }
-
     private void setImageAndInfo(String role, Command command) {
         Drawable imageDrawable = null;
         switch(role) {
@@ -481,7 +297,7 @@ public class PlayActivity extends AppCompatActivity {
                 break;
             case "Pleb1":
                 imageDrawable = getResources().getDrawable(R.drawable.pleb1);
-                    break;
+                break;
             case "Pleb2":
                 imageDrawable = getResources().getDrawable(R.drawable.pleb2);
                 break;
@@ -506,16 +322,134 @@ public class PlayActivity extends AppCompatActivity {
             default:
                 break;
         }
-
         if (imageDrawable != null) {
             ivCharacter.setImageDrawable(imageDrawable);
         }
     }
 
+    private void hideProgressBar() {
+        ProgressBar progressBar = findViewById(R.id.progress_bar_play_activity);
+        progressBar.setVisibility(View.INVISIBLE);
+    }
+
     private void enablePlayerNomination() {
+        Mission mission = Mission.createMission(totalNumberOfPlayers, missionID);
+        Toast.makeText(getApplicationContext(), "Select "+ mission.getTotalNumberOfVotes() +" players", Toast.LENGTH_LONG).show();
         nominatedPlayers.clear();
         clickablePlayerIcons = true;
         btnNominate.setVisibility(View.VISIBLE);
+    }
+
+    View.OnClickListener btnHideInfoOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if (visibleInfo) {
+                tvYouAre.setVisibility(View.INVISIBLE);
+                ivCharacter.setVisibility(View.INVISIBLE);
+                tvInfo.setVisibility(View.INVISIBLE);
+                btnHideInfo.setText("SHOW INFO");
+                visibleInfo = false;
+            }
+            else {
+                tvYouAre.setVisibility(View.VISIBLE);
+                ivCharacter.setVisibility(View.VISIBLE);
+                ivCharacter.setVisibility(View.VISIBLE);
+                btnHideInfo.setText("HIDE INFO");
+                visibleInfo = true;
+            }
+        }
+    };
+    View.OnClickListener btnNominateOnClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!nominatedPlayersListFull()) {
+                    Toast.makeText(getApplicationContext(), "You have not selected required number of players", Toast.LENGTH_LONG).show();
+                    return;
+                }
+                sendNominatedPlayersToServer();
+                clickablePlayerIcons = false;
+                unselectPlayerIcons();
+                v.setVisibility(View.INVISIBLE);
+            }
+    };
+
+    private void unselectPlayerIcons() {
+        for (TextView tv : tvPlayersList) {
+            tv.setCompoundDrawablesWithIntrinsicBounds(null, null, null, getResources().getDrawable(R.drawable.player));
+        }
+    }
+
+    View.OnClickListener playerIconOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if (!clickablePlayerIcons)
+                return;
+            TextView clickedTextView = (TextView) v;
+            String nominatedPlayer = clickedTextView.getText().toString();
+            changePlayerIcon(clickedTextView, nominatedPlayer);
+        }
+    };
+
+    private void changePlayerIcon(TextView clickedTextView, String nominatedPlayer) {
+        if (addToNominatedPlayers(nominatedPlayer))
+            clickedTextView.setCompoundDrawablesWithIntrinsicBounds(null, null, null, getResources().getDrawable(R.drawable.player_nominated));
+        else
+            clickedTextView.setCompoundDrawablesWithIntrinsicBounds(null, null, null, getResources().getDrawable(R.drawable.player));
+    }
+
+    private boolean addToNominatedPlayers(String nominatedPlayer) {
+        if (nominatedPlayers.contains(nominatedPlayer)) {
+            nominatedPlayers.remove(nominatedPlayer);
+            return false;
+        }
+        if (nominatedPlayersListFull()) {
+            Toast.makeText(getApplicationContext(), "You selected the maximum number of players.", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        nominatedPlayers.add(nominatedPlayer);
+        return true;
+    }
+
+    private boolean nominatedPlayersListFull() {
+        Mission mission = Mission.createMission(totalNumberOfPlayers, missionID);
+        if (nominatedPlayers.size() == mission.getTotalNumberOfVotes())
+            return true;
+        return false;
+    }
+
+    private void sendNominatedPlayersToServer() {
+        String[] nominatedPlayersArray = convertListOfStringsToArray(nominatedPlayers);
+        Command command = createCommandForNomination(setCommandForServer(), nominatedPlayersArray);
+        sendCommand(command);
+    }
+
+    private String[] convertListOfStringsToArray(ArrayList<String> nominatedPlayers) {
+        String[] nominatedPlayersArray = new String[nominatedPlayers.size()];
+        nominatedPlayers.toArray(nominatedPlayersArray);
+        return nominatedPlayersArray;
+    }
+
+    private String setCommandForServer() {
+        if (missionID == 0)
+            return "guessMerlin";
+        else
+            return "nominated";
+    }
+
+    private Command createCommandForNomination(String commandForServer, String[] nominatedPlayersArray) {
+        Command command = null;
+        if (commandForServer.equals("nominated"))
+            command = new Command(commandForServer, username, nominatedPlayersArray);
+        else if (commandForServer.equals("guessMerlin")) {
+            String name = Arrays.toString(nominatedPlayersArray);
+            command = new Command(commandForServer, name.substring(1, name.length()-1));
+        }
+        return command;
+    }
+
+    private void sendCommand(Command command) {
+        String message = gson.toJson(command);
+        webSocketClient.send(message);
     }
 
     public void openVoteDialog(Command command) {
@@ -530,7 +464,6 @@ public class PlayActivity extends AppCompatActivity {
         sendCommand(command);
     }
 
-    //server posalje niz tipa yes yes no no pa onda na osnovu toga ucitaj kruzice
     public void showVoteNextToPlayer(Command command) {
         String[] playerNames = command.getNominated();
         Boolean[] playerVotes = command.getVotes();
@@ -603,5 +536,8 @@ public class PlayActivity extends AppCompatActivity {
 
     public void exit() {
         System.out.println("EXIT");
+        moveTaskToBack(true);
+        android.os.Process.killProcess(android.os.Process.myPid());
+        System.exit(1);
     }
 }

@@ -34,46 +34,46 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        base=new Base();
-        Base.sharedPreferences=getSharedPreferences(base.getPreferencesKey(),MODE_PRIVATE);
-
-        String playerId, roomId;
-
-        playerId = base.getPlayerId();
-        roomId = base.getRoomId();
-
-        System.out.println("PLAYER I ROOM ID: "+ playerId + " "+ roomId);
-
-        player = new Player("null","null","null","null");
-        logger.info("OPEN");
-        createWebSocketClient();
-
-        while(webSocketClient == null){
-
-        }
+//        base=new Base();
+//        Base.sharedPreferences=getSharedPreferences(base.getPreferencesKey(),MODE_PRIVATE);
+//
+//        String playerId, roomId;
+//
+//        playerId = base.getPlayerId();
+//        roomId = base.getRoomId();
+//
+//        System.out.println("PLAYER I ROOM ID: "+ playerId + " "+ roomId);
+//
+//        player = new Player("null","null","null","null");
+//        logger.info("OPEN");
+//        createWebSocketClient();
+//
+//        while(webSocketClient == null){
+//
+//        }
     }
 
     public void goToCreateGameActivity(View view) {
-        player.setCommand("newPlayer");
-        try{
-        String message = gson.toJson(player);
-        System.out.println("JSON " + message);
-        webSocketClient.send(message);
-        while(player.getRoomId().equals("null")){
-
-        }
-
-        base.savePlayerId(player.getPlayerId());
-        base.saveRoomId(player.getRoomId());
-
-        startActivity(new Intent(MainActivity.this,CreateGameActivity.class));
-
-        }catch (Exception e){
-            System.out.println("PRVI PEDER");
-            System.out.println(e.getMessage());
-            System.out.println(e.getStackTrace());
-        }
-     //  startActivity(new Intent(MainActivity.this,PlayActivity.class));
+//        player.setCommand("newPlayer");
+//        try{
+//        String message = gson.toJson(player);
+//        System.out.println("JSON " + message);
+//        webSocketClient.send(message);
+//        while(player.getRoomId().equals("null")){
+//
+//        }
+//
+//        base.savePlayerId(player.getPlayerId());
+//        base.saveRoomId(player.getRoomId());
+//
+//        startActivity(new Intent(MainActivity.this,CreateGameActivity.class));
+//
+//        }catch (Exception e){
+//            System.out.println("PRVI PEDER");
+//            System.out.println(e.getMessage());
+//            System.out.println(e.getStackTrace());
+//        }
+       startActivity(new Intent(MainActivity.this,PlayActivity.class));
     }
 
     public void goToJoinGameActivity(View view) {

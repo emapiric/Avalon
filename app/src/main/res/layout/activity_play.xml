@@ -108,7 +108,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:weightSum="2">
+            android:weightSum="3">
             <TextView
                 android:layout_weight="1"
                 android:id="@+id/tv_player2"
@@ -119,9 +119,15 @@
                 android:textSize="15sp"
                 android:textColor="#FFFFFF"
                 android:drawableBottom="@drawable/player"
-                android:layout_marginRight="90dp"
+                android:layout_marginRight="30dp"
                 />
-
+            <ProgressBar
+                android:id="@+id/progress_bar_play_activity"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:indeterminate="true"
+                android:layout_marginRight="30dp"/>
             <TextView
                 android:layout_weight="1"
                 android:id="@+id/tv_player3"
@@ -231,7 +237,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"
-            app:itemTextColor="#FFFFFF"
             app:menu="@menu/mission_navigation"
             app:labelVisibilityMode="unlabeled"
             app:itemIconTint="@drawable/mission_navigation_selector"
@@ -260,7 +265,6 @@
             android:textColor="#FFFFFF"
             android:textSize="20sp"
             android:layout_gravity="center"
-            android:onClick="hideInfo"
             />
 
     </LinearLayout>

@@ -30,16 +30,17 @@ public class GameOverDialog extends DialogFragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.dialog_vote, container);
+        View view = inflater.inflate(R.layout.dialog_game_over, container);
         final PlayActivity parent = (PlayActivity)getActivity();
         findViews(view);
+        System.out.println(tvInfo.getText().toString());
         if (command.getCommand().equals("gameOver"))
             tvInfo.setText(command.getValue() + " team has won the game.");
         //u suprotnom je komanda merlinGuessed i proveravamo da li je pogodjen ili ne
         else if (command.isAccepted())
-            tvInfo.setText("Merlin guessed. Evil team has won the game.\nAssassin and Merlin were "+command.getNominated()[0]+command.getNominated()[1]);
+            tvInfo.setText("Merlin guessed. Evil team has won the game.\nAssassin and Merlin were "+command.getNominated()[0]+" and "+command.getNominated()[1]);
         else
-            tvInfo.setText("Merlin not guessed. Good team has won the game.\nAssassin and Merlin were "+command.getNominated()[0]+command.getNominated()[1]);
+            tvInfo.setText("Merlin not guessed. Good team has won the game.\nAssassin and Merlin were "+command.getNominated()[0]+" and "+command.getNominated()[1]);
         btnPlayAgain.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
